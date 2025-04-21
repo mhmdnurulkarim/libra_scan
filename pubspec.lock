@@ -75,6 +75,27 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_web_plugins:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  get:
+    dependency: "direct dev"
+    description:
+      name: get
+      sha256: c79eeb4339f1f3deffd9ec912f8a923834bec55f7b49c9e882b8fef2c139d425
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.7.2"
+  go_router:
+    dependency: "direct dev"
+    description:
+      name: go_router
+      sha256: "4cdfcc6a178632d1dbb7a728f8e84a1466211354704b9cdc03eee661d3277732"
+      url: "https://pub.dev"
+    source: hosted
+    version: "15.0.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -107,6 +128,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
   matcher:
     dependency: transitive
     description:
@@ -208,6 +237,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.2.5"
+  web:
+    dependency: transitive
+    description:
+      name: web
+      sha256: "868d88a33d8a87b18ffc05f9f030ba328ffefba92d6c127917a2ba740f9cfe4a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
 sdks:
   dart: ">=3.5.3 <4.0.0"
-  flutter: ">=3.18.0-18.0.pre.54"
+  flutter: ">=3.22.0"
