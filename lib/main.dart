@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:libra_scan/common/routes/app_router.dart';
+import 'package:get/get.dart';
+import 'common/routes/app_pages.dart';
+import 'common/routes/app_routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,10 +12,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LibraScan',
-      routerConfig: router,
+      initialRoute: AppRoutes.splash,
+      getPages: AppPages.routes,
     );
   }
 }

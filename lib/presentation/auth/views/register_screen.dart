@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -35,7 +35,7 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.push('/register-detail');
+                Get.to('/register-detail');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -50,7 +50,7 @@ class RegisterScreen extends StatelessWidget {
                 const Text('Sudah punya akun? '),
                 GestureDetector(
                   onTap: () {
-                    context.go('/login');
+                    Get.toNamed('/login');
                   },
                   child: const Text(
                     'Masuk',

@@ -21,11 +21,10 @@ class LoginController extends GetxController {
       await Future.delayed(const Duration(seconds: 2));
 
       // Simulasi validasi login
-      if (emailController.text == "admin@libra.com" && passwordController.text == "admin123") {
+      if (emailController.text == "admin" && passwordController.text == "123") {
         Get.snackbar('Sukses', 'Berhasil masuk!',
             backgroundColor: Colors.green, colorText: Colors.white);
-        // Navigasi ke home atau dashboard
-        // Get.offAllNamed('/home');
+        Get.offAllNamed('/home-user');
       } else {
         Get.snackbar('Error', 'Email atau kata sandi salah',
             backgroundColor: Colors.redAccent, colorText: Colors.white);
