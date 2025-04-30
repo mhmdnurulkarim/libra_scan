@@ -10,7 +10,8 @@ class SearchAdminScreen extends StatefulWidget {
 
 class _SearchAdminScreenState extends State<SearchAdminScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final List<String> dummyBooks = List.generate(10, (index) => 'Judul Buku $index');
+  final List<String> dummyBooks =
+      List.generate(10, (index) => 'Judul Buku $index');
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,8 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
               itemCount: dummyBooks.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: const Color(0xFFF9F0FF),
@@ -75,23 +77,6 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
         onPressed: () {
           Get.toNamed('/book-management');
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        onTap: (index) {
-          if (index == 0) {
-            Get.toNamed('/home-admin');
-          } else if (index == 1) {
-            Get.toNamed('/search-admin');
-          } else if (index == 2) {
-            Get.toNamed('/profile');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
       ),
     );
   }

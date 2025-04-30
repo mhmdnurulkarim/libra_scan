@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../controllers/home_user_controller.dart';
-import '../widgets/book_card.dart';
+import '../../controllers/home_user_controller.dart';
+import '../../widgets/book_card.dart';
 
-class HomeUserScreen extends StatelessWidget {
+class HomeUserScreen extends StatefulWidget {
   HomeUserScreen({super.key});
 
+  @override
+  State<HomeUserScreen> createState() => _HomeUserScreenState();
+}
+
+class _HomeUserScreenState extends State<HomeUserScreen> {
   final HomeController controller = Get.put(HomeController());
 
   void _openScanner(BuildContext context) {
@@ -16,23 +21,6 @@ class HomeUserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 0) {
-            Get.toNamed('/home-user');
-          } else if (index == 1) {
-            Get.toNamed('/search-user');
-          } else if (index == 2) {
-            Get.toNamed('/profile');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),

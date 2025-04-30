@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MemberRequestCard extends StatelessWidget {
   final String name;
@@ -36,6 +37,9 @@ class MemberRequestCard extends StatelessWidget {
             const Text('Buku', style: TextStyle(fontSize: 12)),
           ],
         ),
+        onTap: () {
+          Get.toNamed('/transaction-admin');
+        },
       ),
     );
   }

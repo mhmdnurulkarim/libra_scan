@@ -21,7 +21,7 @@ class ScannerScreen extends StatelessWidget {
               backgroundColor: Colors.green,
               colorText: Colors.white,
             );
-            Get.back(); // langsung kembali ke Home setelah scan
+            Get.toNamed('/book-detail');
           }
         },
       ),

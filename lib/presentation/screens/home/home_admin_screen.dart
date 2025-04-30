@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/home_admin_controller.dart';
-import '../widgets/member_request_card.dart';
+
+import '../../controllers/home_admin_controller.dart';
+import '../../widgets/member_request_card.dart';
 
 class HomeAdminScreen extends StatelessWidget {
   HomeAdminScreen({super.key});
@@ -15,23 +16,6 @@ class HomeAdminScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 0) {
-            Get.toNamed('/home-admin');
-          } else if (index == 1) {
-            Get.toNamed('/search-admin');
-          } else if (index == 2) {
-            Get.toNamed('/profile');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -60,14 +44,14 @@ class HomeAdminScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Obx(() => Column(
-              children: controller.loanRequests
-                  .map((member) => MemberRequestCard(
-                name: member['name'] ?? '',
-                id: member['id'] ?? '',
-                books: member['books'] ?? 0,
-              ))
-                  .toList(),
-            )),
+                  children: controller.loanRequests
+                      .map((member) => MemberRequestCard(
+                            name: member['name'] ?? '',
+                            id: member['id'] ?? '',
+                            books: member['books'] ?? 0,
+                          ))
+                      .toList(),
+                )),
             const SizedBox(height: 24),
             const Text(
               'Permintaan booking buku:',
@@ -75,14 +59,14 @@ class HomeAdminScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Obx(() => Column(
-              children: controller.bookingRequests
-                  .map((member) => MemberRequestCard(
-                name: member['name'] ?? '',
-                id: member['id'] ?? '',
-                books: member['books'] ?? 0,
-              ))
-                  .toList(),
-            )),
+                  children: controller.bookingRequests
+                      .map((member) => MemberRequestCard(
+                            name: member['name'] ?? '',
+                            id: member['id'] ?? '',
+                            books: member['books'] ?? 0,
+                          ))
+                      .toList(),
+                )),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BookCard extends StatelessWidget {
   final String title;
@@ -28,6 +29,9 @@ class BookCard extends StatelessWidget {
         title: Text(title),
         subtitle: Text(author),
         trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () {
+          Get.toNamed('/book-detail');
+        },
       ),
     );
   }
