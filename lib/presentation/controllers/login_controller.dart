@@ -1,37 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   var isLoading = false.obs;
 
-  void login() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      Get.snackbar('Error', 'Email dan kata sandi wajib diisi',
-          backgroundColor: Colors.redAccent, colorText: Colors.white);
-      return;
-    }
-
-    isLoading.value = true;
-
+  Future<User?> loginWithEmail() async {
     try {
-      // Simulasi request login
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Simulasi validasi login
-      if (emailController.text == "123" && passwordController.text == "123") {
-        Get.snackbar('Sukses', 'Berhasil masuk!',
-            backgroundColor: Colors.green, colorText: Colors.white);
-        Get.offAllNamed('/main');
-      } else {
-        Get.snackbar('Error', 'Email atau kata sandi salah',
-            backgroundColor: Colors.redAccent, colorText: Colors.white);
-      }
+      isLoading.value = true;
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      return userCredential.user;
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan server',
-          backgroundColor: Colors.redAccent, colorText: Colors.white);
+      print("Login error: $e");
+      Get.snackbar('Login Gagal', e.toString(),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white);
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<User?> loginWithGoogle() async {
+    try {
+      isLoading.value = true;
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return null;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+      return userCredential.user;
+    } catch (e) {
+      print("Google login error: $e");
+      Get.snackbar('Gagal login via Google', e.toString(),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white);
+      return null;
     } finally {
       isLoading.value = false;
     }

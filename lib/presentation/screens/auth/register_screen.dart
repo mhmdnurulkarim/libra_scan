@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/register_controller.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -18,16 +20,21 @@ class RegisterScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Implement Google Sign In
+              onPressed: () async {
+                final registerController = Get.put(RegisterController());
+                final user = await registerController.loginWithGoogle();
+                if (user != null) {
+                  Get.offAllNamed('/main');
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.black),
-                minimumSize: const Size.fromHeight(50),
+                backgroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                side: const BorderSide(color: Colors.black12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              icon: const Icon(Icons.g_mobiledata),
+              icon: const Icon(Icons.g_mobiledata, size: 28),
               label: const Text('Daftar dengan Google'),
             ),
             const SizedBox(height: 16),
@@ -35,13 +42,14 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                Get.to('/register-detail');
+                Get.toNamed('/register-detail');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                minimumSize: const Size.fromHeight(50),
+                backgroundColor: const Color(0xFF2ECC71),
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text('Lanjutkan dengan email'),
+              child: const Text("Lanjutkan dengan email", style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 24),
             Row(
@@ -50,7 +58,7 @@ class RegisterScreen extends StatelessWidget {
                 const Text('Sudah punya akun? '),
                 GestureDetector(
                   onTap: () {
-                    Get.toNamed('/login');
+                    Get.offNamed('/login');
                   },
                   child: const Text(
                     'Masuk',

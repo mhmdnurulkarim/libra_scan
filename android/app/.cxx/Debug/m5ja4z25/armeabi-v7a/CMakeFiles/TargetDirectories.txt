@@ -1,0 +1,2 @@
+D:/Project/Website/libra_scan/android/app/.cxx/Debug/m5ja4z25/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/Project/Website/libra_scan/android/app/.cxx/Debug/m5ja4z25/armeabi-v7a/CMakeFiles/rebuild_cache.dir

@@ -13,7 +13,20 @@
           "package_name": "com.mhmdnurulkarim.librascan.libra_scan"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "10237643625-c95bhcb5dbg0cerpft90r5l1e3mf5sua.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mhmdnurulkarim.librascan.libra_scan",
+            "certificate_hash": "9d443308c55cd2187b403789666f74b2427a1a77"
+          }
+        },
+        {
+          "client_id": "10237643625-agretcpour0067ship6bglku0u2euh7o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCF_PYyrCEnzLUvKeXhq1iAw_vWty8dzmg"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "10237643625-agretcpour0067ship6bglku0u2euh7o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "10237643625-pvucjfuuaccafuho1absvi6ho0s1djp9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mhmdnurulkarim.librascan.libraScan"
+              }
+            }
+          ]
         }
       }
     }

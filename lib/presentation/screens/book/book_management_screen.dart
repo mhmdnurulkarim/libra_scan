@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BookManagementScreen extends StatefulWidget {
   const BookManagementScreen({super.key});
@@ -17,10 +18,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
   final TextEditingController synopsisController = TextEditingController();
 
   void _scanBarcode() async {
-    // logika scan barcode nanti kamu sambungin ke plugin barcode scanner
-    setState(() {
-      barcodeController.text = '1234567890'; // contoh hasil scan
-    });
+    Get.toNamed('/scanner');
   }
 
   void _saveBook() {
