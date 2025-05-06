@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class SearchUserScreen extends StatefulWidget {
+  const SearchUserScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<SearchUserScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends State<SearchUserScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> dummyBooks = List.generate(10, (index) => 'Judul Buku $index');
 

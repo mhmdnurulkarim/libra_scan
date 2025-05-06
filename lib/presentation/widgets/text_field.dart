@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class TxtFormField extends StatefulWidget {
+class MyTextField extends StatefulWidget {
   final String label;
   final bool obscureText;
   final TextInputType keyboardType;
   final TextEditingController controller;
   final bool showPasswordToggle;
 
-  const TxtFormField({
+  const MyTextField({
     required this.label,
     required this.obscureText,
     required this.keyboardType,
@@ -17,10 +17,10 @@ class TxtFormField extends StatefulWidget {
   });
 
   @override
-  State<TxtFormField> createState() => _TxtFormFieldState();
+  State<MyTextField> createState() => MyTextFieldState();
 }
 
-class _TxtFormFieldState extends State<TxtFormField> {
+class MyTextFieldState extends State<MyTextField> {
   late FocusNode _focusNode;
   bool _isObscure = true;
 

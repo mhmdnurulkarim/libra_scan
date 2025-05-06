@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:libra_scan/presentation/widgets/text_field.dart';
 
-import '../../controllers/login_controller.dart';
+import '../../../utils/color_constans.dart';
+import '../../controllers/auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final loginController = Get.put(LoginController());
+    final controller = Get.put(AuthController());
 
     return Scaffold(
       body: SafeArea(
@@ -27,12 +29,7 @@ class LoginScreen extends StatelessWidget {
 
                 // Login dengan Google
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    final user = await loginController.loginWithGoogle();
-                    if (user != null) {
-                      Get.offAllNamed('/main');
-                    }
-                  },
+                  onPressed: controller.loginWithGoogle,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.white,
@@ -50,18 +47,18 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Email
-                TxtFormField(
+                MyTextField(
                   label: "Email",
-                  controller: loginController.emailController,
+                  controller: controller.emailController,
                   keyboardType: TextInputType.emailAddress,
                   obscureText: false,
                 ),
                 const SizedBox(height: 12),
 
                 // Password
-                TxtFormField(
+                MyTextField(
                   label: "Password",
-                  controller: loginController.passwordController,
+                  controller: controller.passwordController,
                   obscureText: true,
                   keyboardType: TextInputType.visiblePassword,
                   showPasswordToggle: true,
@@ -84,37 +81,14 @@ class LoginScreen extends StatelessWidget {
 
                 // Tombol Login
                 Obx(
-                  () => ElevatedButton(
-                    onPressed: () async {
-                      final email = loginController.emailController.text.trim();
-                      final password =
-                          loginController.passwordController.text.trim();
-
-                      if (email.isEmpty || password.isEmpty) {
-                        Get.snackbar(
-                          'Validasi Gagal',
-                          'Email dan kata sandi wajib diisi',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.orange,
-                          colorText: Colors.white,
-                        );
-                        return;
-                      }
-
-                      final user = await loginController.loginWithEmail();
-                      if (user != null) {
-                        Get.offAllNamed('/main');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2ECC71),
-                      minimumSize: const Size(double.infinity, 48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                  () => MyButton(
+                    onPressed:
+                        controller.isLoading.value
+                            ? null
+                            : controller.loginWithEmail,
+                    color: ColorConstant.buttonColor,
                     child:
-                        loginController.isLoading.value
+                        controller.isLoading.value
                             ? const SizedBox(
                               width: 24,
                               height: 24,

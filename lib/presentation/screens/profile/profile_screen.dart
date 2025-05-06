@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:libra_scan/presentation/widgets/button.dart';
+import 'package:libra_scan/utils/color_constans.dart';
+
+import '../../controllers/auth_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(AuthController());
     bool isDarkMode = true;
 
     return Scaffold(
@@ -43,15 +48,12 @@ class ProfileScreen extends StatelessWidget {
                           child: Column(
                             children: [
                               // Simulasi Barcode
-                              SizedBox(
-                                height: 40,
-                                child: Placeholder(),
-                              ),
+                              SizedBox(height: 40, child: Placeholder()),
                               SizedBox(height: 4),
                               Text('24110900009'),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -78,17 +80,18 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Tombol keluar
-            ElevatedButton(
-              onPressed: () {
-                // Logout action
-                Get.offAllNamed('/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: const Size.fromHeight(50),
+            Obx(
+              () => MyButton(
+                onPressed: controller.logout,
+                color: ColorConstant.redColor,
+                child:
+                    controller.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                          "Keluar", style: TextStyle(color: Colors.white),
+                        ),
               ),
-              child: const Text('Keluar'),
-            )
+            ),
           ],
         ),
       ),

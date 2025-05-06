@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:libra_scan/presentation/widgets/text_field.dart';
-import '../../controllers/register_controller.dart';
+
+import '../../../utils/color_constans.dart';
+import '../../controllers/auth_controller.dart';
+import '../../widgets/text_field.dart';
+import '../../widgets/button.dart';
 
 class RegisterDetailScreen extends StatelessWidget {
   const RegisterDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final registerController = Get.put(RegisterController());
+    final controller = Get.put(AuthController());
+
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      controller.emailController.text = args['email'] ?? '';
+      controller.userId = args['user_id'];
+      controller.isFromGoogle = true;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -19,65 +29,68 @@ class RegisterDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(24.0),
         child: ListView(
           children: [
-            TxtFormField(
+            MyTextField(
               label: 'Email',
-              controller: registerController.emailController,
+              controller: controller.emailController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
-            TxtFormField(
+            MyTextField(
               label: 'Password',
-              controller: registerController.passwordController,
+              controller: controller.passwordController,
               obscureText: true,
               keyboardType: TextInputType.visiblePassword,
               showPasswordToggle: true,
             ),
             const SizedBox(height: 16),
-            TxtFormField(
+            MyTextField(
               label: 'NIK',
-              controller: registerController.nikController,
+              controller: controller.nikController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
-            TxtFormField(
+            MyTextField(
               label: 'Nama Lengkap',
-              controller: registerController.nameController,
+              controller: controller.nameController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
-            TxtFormField(
+            MyTextField(
               label: 'Alamat',
-              controller: registerController.addressController,
+              controller: controller.addressController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
-            TxtFormField(
+            MyTextField(
               label: 'Nomor HP',
-              controller: registerController.phoneController,
+              controller: controller.phoneController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 32),
             Obx(
-              () => ElevatedButton(
+              () => MyButton(
                 onPressed:
-                    registerController.isLoading.value
+                    controller.isLoading.value
                         ? null
-                        : registerController.register,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                        : controller.isFromGoogle
+                        ? controller.registerWithGoogle
+                        : controller.registerWithEmail,
+                color: ColorConstant.buttonColor,
                 child:
-                    registerController.isLoading.value
-                        ? const CircularProgressIndicator(color: Colors.white)
+                    controller.isLoading.value
+                        ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                         : const Text(
                           'Daftar',
                           style: TextStyle(color: Colors.white),

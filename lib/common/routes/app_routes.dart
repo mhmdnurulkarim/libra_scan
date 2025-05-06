@@ -8,7 +8,7 @@ import '../../presentation/screens/auth/register_detail_screen.dart';
 import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/book/book_detail_screen.dart';
 import '../../presentation/screens/book/book_management_screen.dart';
-import '../../presentation/screens/home/scanner_screen.dart';
+import '../../presentation/widgets/scanner_screen.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/transaction/transaction_admin_screen.dart';
 import '../../presentation/screens/transaction/transaction_user_screen.dart';

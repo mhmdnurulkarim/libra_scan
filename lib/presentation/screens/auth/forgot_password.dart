@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/text_field.dart';
+import 'package:libra_scan/utils/color_constans.dart';
 
-import '../../controllers/forgot_password_controller.dart';
+import '../../controllers/auth_controller.dart';
+import '../../widgets/button.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final forgotController = Get.put(ForgotPasswordController());
+    final controller = Get.put(AuthController());
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Lupa Kata Sandi"), centerTitle: true,),
+      appBar: AppBar(title: const Text("Lupa Kata Sandi"), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -20,28 +22,22 @@ class ForgotPasswordScreen extends StatelessWidget {
           children: [
             const Text("Masukkan email untuk reset Password."),
             const SizedBox(height: 16),
-            TxtFormField(
+            MyTextField(
               label: "Email",
-              controller: forgotController.emailController,
+              controller: controller.emailController,
               keyboardType: TextInputType.emailAddress,
               obscureText: false,
             ),
             const SizedBox(height: 24),
             Obx(
-              () => ElevatedButton(
+              () => MyButton(
                 onPressed:
-                    forgotController.isLoading.value
+                    controller.isLoading.value
                         ? null
-                        : forgotController.sendResetEmail,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                        : controller.forgotPassword,
+                color: ColorConstant.buttonColor,
                 child:
-                    forgotController.isLoading.value
+                    controller.isLoading.value
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                           "Kirim Link Reset",

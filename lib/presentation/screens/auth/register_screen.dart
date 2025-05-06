@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/register_controller.dart';
+import '../../controllers/auth_controller.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(AuthController());
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -20,19 +22,15 @@ class RegisterScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () async {
-                final registerController = Get.put(RegisterController());
-                final user = await registerController.loginWithGoogle();
-                if (user != null) {
-                  Get.offAllNamed('/main');
-                }
-              },
+              onPressed: controller.loginWithGoogle,
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.black,
                 backgroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 48),
                 side: const BorderSide(color: Colors.black12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               icon: const Icon(Icons.g_mobiledata, size: 28),
               label: const Text('Daftar dengan Google'),
@@ -47,9 +45,14 @@ class RegisterScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2ECC71),
                 minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              child: const Text("Lanjutkan dengan email", style: TextStyle(color: Colors.white)),
+              child: const Text(
+                "Lanjutkan dengan email",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             const SizedBox(height: 24),
             Row(
