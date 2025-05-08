@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+
+import '../../../common/constants/color_constans.dart';
 import '../../controllers/home_user_controller.dart';
 import '../../widgets/book_card.dart';
 
@@ -12,11 +13,7 @@ class HomeUserScreen extends StatefulWidget {
 }
 
 class _HomeUserScreenState extends State<HomeUserScreen> {
-  final HomeController controller = Get.put(HomeController());
-
-  void _openScanner(BuildContext context) {
-    Get.toNamed('/scanner');
-  }
+  final controller = Get.put(HomeUserController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,21 +22,18 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            GestureDetector(
-              onTap: () => _openScanner(context),
-              child: Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
+            ElevatedButton(
+              onPressed: () => Get.toNamed('/scanner'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstant.greenColor,
+                minimumSize: const Size(double.infinity, 120),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
                 ),
-                child: const Center(
-                  child: Text(
-                    'Fitur Scanner',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
+              ),
+              child: Text(
+                'Scan Barcode',
+                style: TextStyle(fontSize: 18, color: ColorConstant.whiteColor),
               ),
             ),
             const SizedBox(height: 24),
@@ -48,28 +42,36 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Obx(() => Column(
-              children: controller.currentLoans
-                  .map((loan) => BookCard(
-                title: loan['title'] ?? '',
-                author: loan['author'] ?? '',
-              ))
-                  .toList(),
-            )),
+            Obx(
+              () => Column(
+                children:
+                    controller.currentLoans.map((loan) {
+                      return BookCard(
+                        title: loan['title'] ?? '',
+                        author: loan['author'] ?? '',
+                        onTap: () => controller.goToDetail(loan),
+                      );
+                    }).toList(),
+              ),
+            ),
             const SizedBox(height: 24),
             const Text(
               'Peminjaman sebelumnya:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Obx(() => Column(
-              children: controller.pastLoans
-                  .map((loan) => BookCard(
-                title: loan['title'] ?? '',
-                author: loan['author'] ?? '',
-              ))
-                  .toList(),
-            )),
+            Obx(
+              () => Column(
+                children:
+                    controller.currentLoans.map((loan) {
+                      return BookCard(
+                        title: loan['title'] ?? '',
+                        author: loan['author'] ?? '',
+                        onTap: () => controller.goToDetail(loan),
+                      );
+                    }).toList(),
+              ),
+            ),
           ],
         ),
       ),

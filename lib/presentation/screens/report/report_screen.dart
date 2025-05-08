@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+
+import '../../../common/constants/color_constans.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -20,9 +23,16 @@ class _ReportScreenState extends State<ReportScreen> {
 
   List<BarChartGroupData> get barData {
     return List.generate(values.length, (index) {
-      return BarChartGroupData(x: index, barRods: [
-        BarChartRodData(toY: values[index], color: Colors.lightBlue, width: 22)
-      ]);
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: values[index],
+            color: Colors.lightBlue,
+            width: 22,
+          ),
+        ],
+      );
     });
   }
 
@@ -31,24 +41,35 @@ class _ReportScreenState extends State<ReportScreen> {
 
     pdf.addPage(
       pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text("Laporan Perpustakaan",
-                style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 20),
-            pw.Table.fromTextArray(
-              headers: ['Tahun', 'Jumlah'],
-              data: List.generate(
-                xLabels.length,
-                    (index) => [xLabels[index], values[index].toStringAsFixed(2)],
-              ),
+        build:
+            (context) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  "Laporan Perpustakaan",
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Table.fromTextArray(
+                  headers: ['Tahun', 'Jumlah'],
+                  data: List.generate(
+                    xLabels.length,
+                    (index) => [
+                      xLabels[index],
+                      values[index].toStringAsFixed(2),
+                    ],
+                  ),
+                ),
+                pw.SizedBox(height: 40),
+                pw.Text(
+                  'Filter: $selectedFilter',
+                  style: const pw.TextStyle(fontSize: 12),
+                ),
+              ],
             ),
-            pw.SizedBox(height: 40),
-            pw.Text('Filter: $selectedFilter',
-                style: const pw.TextStyle(fontSize: 12)),
-          ],
-        ),
       ),
     );
 
@@ -72,21 +93,23 @@ class _ReportScreenState extends State<ReportScreen> {
             // Filter
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: filters.map((filter) {
-                bool isSelected = selectedFilter == filter;
-                return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isSelected ? Colors.black : Colors.grey,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      selectedFilter = filter;
-                    });
-                  },
-                  child: Text(filter),
-                );
-              }).toList(),
+              children:
+                  filters.map((filter) {
+                    bool isSelected = selectedFilter == filter;
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isSelected ? Colors.black : Colors.grey,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          selectedFilter = filter;
+                        });
+                      },
+                      child: Text(filter),
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: 24),
 
@@ -114,8 +137,12 @@ class _ReportScreenState extends State<ReportScreen> {
                         },
                       ),
                     ),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                   ),
                   barTouchData: BarTouchData(
                     enabled: true,
@@ -138,15 +165,15 @@ class _ReportScreenState extends State<ReportScreen> {
             // Tombol Ekspor PDF
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: MyButton(
                 onPressed: _generatePdfReport,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                color: ColorConstant.greenColor,
+                child: const Text(
+                  "Ekspor Laporan (PDF)",
+                  style: TextStyle(color: Colors.white),
                 ),
-                child: const Text("Ekspor Laporan (PDF)"),
               ),
-            )
+            ),
           ],
         ),
       ),

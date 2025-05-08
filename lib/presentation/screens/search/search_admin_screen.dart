@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../common/constants/color_constans.dart';
+import '../../controllers/book_controller.dart';
+import '../../widgets/book_card.dart';
+
 class SearchAdminScreen extends StatefulWidget {
   const SearchAdminScreen({super.key});
 
@@ -9,16 +13,28 @@ class SearchAdminScreen extends StatefulWidget {
 }
 
 class _SearchAdminScreenState extends State<SearchAdminScreen> {
+  final controller = Get.put(BookController());
   final TextEditingController _searchController = TextEditingController();
-  final List<String> dummyBooks =
-      List.generate(10, (index) => 'Judul Buku $index');
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchBooks();
+    _searchController.addListener(() {
+      controller.searchBooks(_searchController.text.trim());
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cari Buku'),
-      ),
+      appBar: AppBar(title: const Text('Cari Buku')),
       body: Column(
         children: [
           Padding(
@@ -38,42 +54,39 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: dummyBooks.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9F0FF),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
+            child: Obx(() {
+              final books = controller.filteredBooks;
+
+              if (books.isEmpty) {
+                return const Center(child: Text('Tidak ada buku ditemukan.'));
+              }
+
+              return ListView.builder(
+                itemCount: books.length,
+                itemBuilder: (context, index) {
+                  final book = books[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
                     ),
-                    child: ListTile(
-                      leading: Container(
-                        width: 50,
-                        height: 50,
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.image),
-                      ),
-                      title: Text(dummyBooks[index]),
-                      subtitle: const Text('Penulis Buku'),
-                      trailing: const Icon(Icons.arrow_forward_ios),
+                    child: BookCard(
+                      title: book['title'],
+                      author: book['author'],
                       onTap: () {
-                        Get.toNamed('/book-detail');
+                        Get.toNamed('/book-detail', arguments: book);
                       },
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFF3EFFF),
-        child: const Icon(Icons.add, color: Colors.black),
+        backgroundColor: ColorConstant.whiteColor,
+        child: Icon(Icons.add, color: ColorConstant.blackColor),
         onPressed: () {
           Get.toNamed('/book-management');
         },

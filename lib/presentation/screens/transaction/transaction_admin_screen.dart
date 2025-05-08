@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../common/constants/color_constans.dart';
+import '../../widgets/button.dart';
+
 class TransactionAdminScreen extends StatelessWidget {
   const TransactionAdminScreen({super.key});
 
@@ -125,18 +128,15 @@ class TransactionAdminScreen extends StatelessWidget {
   Widget _buildActionButton() {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      child: MyButton(
+        onPressed: () {
+          // logika pinjam / booking / kembali
+          debugPrint('Pinjam/Booking/Kembali ditekan');
+        },
+        color: ColorConstant.greenColor,
         child: const Text(
-          'Pinjam/Tolak/Kembali',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          'Pinjam/Booking/Kembali',
+          style: TextStyle(color: Colors.white),
         ),
       ),
     );

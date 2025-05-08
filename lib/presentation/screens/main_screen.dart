@@ -1,94 +1,56 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:libra_scan/presentation/screens/home/home_user_screen.dart';
-import 'package:libra_scan/presentation/screens/profile/profile_screen.dart';
-import 'package:libra_scan/presentation/screens/search/search_admin_screen.dart';
-import 'package:libra_scan/presentation/screens/search/search_user_screen.dart';
+import 'package:get/get.dart';
+import 'package:libra_scan/common/constants/color_constans.dart';
 
+import '../controllers/main_controller.dart';
 import 'home/home_admin_screen.dart';
+import 'home/home_user_screen.dart';
+import 'profile/profile_screen.dart';
+import 'search/search_admin_screen.dart';
+import 'search/search_user_screen.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-  String? role;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserRole();
-  }
-
-  Future<void> _loadUserRole() async {
-    final user_id = FirebaseAuth.instance.currentUser?.uid;
-    if (user_id == null) return;
-
-    try {
-      final userDoc =
-          await FirebaseFirestore.instance
-              .collection('user')
-              .doc(user_id)
-              .get();
-
-      final roleRef = userDoc.data()?['role'] as DocumentReference?;
-      if (roleRef != null) {
-        final roleDoc = await roleRef.get();
-        final roleData = roleDoc.data() as Map<String, dynamic>?;
-        final roleName = roleData?['name'] as String?;
-        setState(() {
-          role = roleName ?? 'user';
-        });
-      } else {
-        setState(() {
-          role = 'user';
-        });
-      }
-    } catch (e) {
-      print("Error fetching role: $e");
-      setState(() {
-        role = 'user';
-      });
-    }
-  }
-
-  List<Widget> get _children {
-    return [
-      role == 'admin' ? HomeAdminScreen() : HomeUserScreen(),
-      role == 'admin' ? SearchAdminScreen() : SearchUserScreen(),
-      ProfileScreen(),
-    ];
-  }
+class MainScreen extends StatelessWidget {
+  MainScreen({super.key});
+  final controller = Get.put(MainScreenController());
 
   @override
   Widget build(BuildContext context) {
-    if (role == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    return Obx(() {
+      if (controller.role.value == null) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
 
-    return Scaffold(
-      body: _children[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        backgroundColor: Colors.white,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
+      final isAdmin = controller.role.value == 'admin';
+
+      // final children = [
+      //   isAdmin ? HomeAdminScreen() : HomeUserScreen(),
+      //   isAdmin ? SearchAdminScreen() : SearchUserScreen(),
+      //   ProfileScreen(),
+      // ];
+
+      final children = [
+        isAdmin ? HomeAdminScreen() : HomeAdminScreen(),
+        isAdmin ? SearchAdminScreen() : SearchAdminScreen(),
+        ProfileScreen(),
+      ];
+
+      return Scaffold(
+        body: children[controller.currentIndex.value],
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: controller.currentIndex.value,
+          backgroundColor: ColorConstant.whiteColor,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          onTap: controller.changeIndex,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Pencarian'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+          ],
+        ),
+      );
+    });
   }
 }

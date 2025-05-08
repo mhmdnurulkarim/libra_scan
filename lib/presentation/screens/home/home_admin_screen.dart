@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../common/constants/color_constans.dart';
 import '../../controllers/home_admin_controller.dart';
 import '../../widgets/member_request_card.dart';
 
@@ -9,10 +10,6 @@ class HomeAdminScreen extends StatelessWidget {
 
   final HomeAdminController controller = Get.put(HomeAdminController());
 
-  void _openScanner(BuildContext context) {
-    Get.toNamed('/scanner');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,21 +17,18 @@ class HomeAdminScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            GestureDetector(
-              onTap: () => _openScanner(context),
-              child: Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
+            ElevatedButton(
+              onPressed: () => Get.toNamed('/scanner'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstant.greenColor,
+                minimumSize: const Size(double.infinity, 120),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
                 ),
-                child: const Center(
-                  child: Text(
-                    'Fitur Scanner',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
+              ),
+              child: Text(
+                'Scan Barcode',
+                style: TextStyle(fontSize: 18, color: ColorConstant.whiteColor),
               ),
             ),
             const SizedBox(height: 24),

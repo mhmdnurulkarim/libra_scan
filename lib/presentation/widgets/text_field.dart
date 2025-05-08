@@ -6,6 +6,7 @@ class MyTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final TextEditingController controller;
   final bool showPasswordToggle;
+  final int maxLines;
 
   const MyTextField({
     required this.label,
@@ -13,6 +14,7 @@ class MyTextField extends StatefulWidget {
     required this.keyboardType,
     required this.controller,
     this.showPasswordToggle = false,
+    this.maxLines = 1,
     super.key,
   });
 
@@ -56,6 +58,7 @@ class MyTextFieldState extends State<MyTextField> {
       obscureText: _isObscure,
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
+      maxLines: widget.maxLines,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,

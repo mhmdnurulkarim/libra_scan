@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:libra_scan/presentation/widgets/button.dart';
+import 'package:libra_scan/presentation/widgets/text_field.dart';
+
+import '../../../common/constants/color_constans.dart';
+import '../../controllers/book_controller.dart';
+
 class BookManagementScreen extends StatefulWidget {
   const BookManagementScreen({super.key});
 
@@ -9,94 +15,152 @@ class BookManagementScreen extends StatefulWidget {
 }
 
 class _BookManagementScreenState extends State<BookManagementScreen> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController isbnController = TextEditingController();
-  final TextEditingController authorController = TextEditingController();
-  final TextEditingController categoryController = TextEditingController();
-  final TextEditingController barcodeController = TextEditingController();
-  final TextEditingController stockController = TextEditingController();
-  final TextEditingController synopsisController = TextEditingController();
+  final controller = Get.put(BookController());
 
-  void _scanBarcode() async {
-    Get.toNamed('/scanner');
+  final titleController = TextEditingController();
+  final isbnController = TextEditingController();
+  final authorController = TextEditingController();
+  final categoryController = TextEditingController();
+  final barcodeController = TextEditingController();
+  final stockController = TextEditingController();
+  final synopsisController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Bersihkan semua controller saat screen dihapus
+    titleController.dispose();
+    isbnController.dispose();
+    authorController.dispose();
+    categoryController.dispose();
+    barcodeController.dispose();
+    stockController.dispose();
+    synopsisController.dispose();
+    super.dispose();
   }
 
-  void _saveBook() {
-    // logika untuk tambah atau edit buku
-    debugPrint('Tambah/Edit Buku');
-  }
+  void _submitBook() {
+    final book = {
+      'title': titleController.text,
+      'isbn': isbnController.text,
+      'author': authorController.text,
+      'category_id': categoryController.text,
+      'barcode': barcodeController.text,
+      'stock': int.tryParse(stockController.text) ?? 0,
+      'synopsis': synopsisController.text,
+    };
 
-  void _deleteBook() {
-    // logika untuk hapus buku
-    debugPrint('Hapus Buku');
+    controller.addBook(book);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manajemen Buku'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildTextField('Judul', titleController),
-            _buildTextField('ISBN', isbnController),
-            _buildTextField('Penulis', authorController),
-            _buildTextField('Kategori', categoryController),
-            Row(
+      appBar: AppBar(title: const Text('Manajemen Buku')),
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: _buildTextField('Barcode', barcodeController),
+                MyTextField(
+                  label: "Judul",
+                  obscureText: false,
+                  keyboardType: TextInputType.text,
+                  controller: titleController,
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                const SizedBox(height: 12),
+                MyTextField(
+                  label: "ISBN",
+                  obscureText: false,
+                  keyboardType: TextInputType.text,
+                  controller: isbnController,
+                ),
+                const SizedBox(height: 12),
+                MyTextField(
+                  label: "Penulis",
+                  obscureText: false,
+                  keyboardType: TextInputType.text,
+                  controller: authorController,
+                ),
+                const SizedBox(height: 12),
+                MyTextField(
+                  label: "Kategori",
+                  obscureText: false,
+                  keyboardType: TextInputType.text,
+                  controller: categoryController,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: MyTextField(
+                        label: "Barcode",
+                        obscureText: false,
+                        keyboardType: TextInputType.text,
+                        controller: barcodeController,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorConstant.greenColor,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () => Get.toNamed('/scanner'),
+                      child: Text(
+                        'Scan Barcode',
+                        style: TextStyle(color: ColorConstant.whiteColor),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                MyTextField(
+                  label: "Stok Buku",
+                  obscureText: false,
+                  keyboardType: TextInputType.number,
+                  controller: stockController,
+                ),
+                const SizedBox(height: 12),
+                MyTextField(
+                  label: "Sinopsis",
+                  obscureText: false,
+                  keyboardType: TextInputType.multiline,
+                  controller: synopsisController,
+                  maxLines: 5,
+                ),
+                const SizedBox(height: 24),
+                MyButton(
+                  onPressed: _submitBook,
+                  color: ColorConstant.greenColor,
+                  child: Text(
+                    'Tambah',
+                    style: TextStyle(color: ColorConstant.whiteColor),
                   ),
-                  onPressed: _scanBarcode,
-                  child: const Text('Scan Barcode'),
+                ),
+                const SizedBox(height: 12),
+                MyButton(
+                  onPressed: () {
+                    // Tambahkan konfirmasi atau logika hapus
+                  },
+                  color: ColorConstant.redColor,
+                  child: Text(
+                    'Hapus',
+                    style: TextStyle(color: ColorConstant.whiteColor),
+                  ),
                 ),
               ],
             ),
-            _buildTextField('Stok Buku', stockController, keyboardType: TextInputType.number),
-            _buildTextField('Sinopsis', synopsisController, maxLines: 5),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveBook,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text('Tambah/Edit'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _deleteBook,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text('Hapus'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
+          ),
         ),
       ),
     );

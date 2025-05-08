@@ -1,29 +1,44 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
-class HomeController extends GetxController {
-  // Dummy list pinjaman sekarang
-  var currentLoans = <Map<String, String>>[].obs;
+class HomeUserController extends GetxController {
+  var currentLoans = <Map<String, dynamic>>[].obs;
+  var pastLoans = <Map<String, dynamic>>[].obs;
 
-  // Dummy list pinjaman sebelumnya
-  var pastLoans = <Map<String, String>>[].obs;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void onInit() {
     super.onInit();
-    fetchLoans();
+    fetchBooks();
   }
 
-  void fetchLoans() {
-    // Dummy data
-    currentLoans.value = [
-      {"title": "Buku 1", "author": "Penulis 1"},
-      {"title": "Buku 2", "author": "Penulis 2"},
-      {"title": "Buku 3", "author": "Penulis 3"},
-    ];
+  void fetchBooks() async {
+    try {
+      final snapshot = await _firestore.collection('book').get();
 
-    pastLoans.value = [
-      {"title": "Buku 4", "author": "Penulis 4"},
-      {"title": "Buku 5", "author": "Penulis 5"},
-    ];
+      currentLoans.value = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'title': data['title'] ?? '',
+          'author': data['author'] ?? '',
+          'isbn': data['isbn'] ?? '',
+          'barcode': data['barcode'] ?? '',
+          'stock': data['stock'] ?? 0,
+          'synopsis': data['synopsis'] ?? '',
+          'category_id': data['category_id'],
+        };
+      }).toList();
+
+      // Jika ingin memisahkan pinjaman sebelumnya, bisa logikakan berdasarkan timestamp/status
+      pastLoans.value = []; // Kosong dulu
+    } catch (e) {
+      print('Error fetching books: $e');
+    }
+  }
+
+  void goToDetail(Map<String, dynamic> bookData) {
+    Get.toNamed('/book-detail', arguments: bookData);
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:libra_scan/presentation/widgets/book_card.dart';
+
+import '../../controllers/book_controller.dart';
 
 class SearchUserScreen extends StatefulWidget {
   const SearchUserScreen({super.key});
@@ -9,15 +12,28 @@ class SearchUserScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchUserScreen> {
+  final controller = Get.put(BookController());
   final TextEditingController _searchController = TextEditingController();
-  final List<String> dummyBooks = List.generate(10, (index) => 'Judul Buku $index');
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchBooks();
+    _searchController.addListener(() {
+      controller.searchBooks(_searchController.text.trim());
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cari Buku'),
-      ),
+      appBar: AppBar(title: const Text('Cari Buku')),
       body: Column(
         children: [
           Padding(
@@ -37,35 +53,33 @@ class _SearchScreenState extends State<SearchUserScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: dummyBooks.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9F0FF),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
+            child: Obx(() {
+              final books = controller.filteredBooks;
+
+              if (books.isEmpty) {
+                return const Center(child: Text('Tidak ada buku ditemukan.'));
+              }
+
+              return ListView.builder(
+                itemCount: books.length,
+                itemBuilder: (context, index) {
+                  final book = books[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
                     ),
-                    child: ListTile(
-                      leading: Container(
-                        width: 50,
-                        height: 50,
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.image),
-                      ),
-                      title: Text(dummyBooks[index]),
-                      subtitle: const Text('Penulis Buku'),
-                      trailing: const Icon(Icons.arrow_forward_ios),
+                    child: BookCard(
+                      title: book['title'],
+                      author: book['author'],
                       onTap: () {
-                        Get.toNamed('/book-detail');
+                        Get.toNamed('/book-detail', arguments: book);
                       },
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),

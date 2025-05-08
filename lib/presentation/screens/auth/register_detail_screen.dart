@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../utils/color_constans.dart';
+import '../../../common/constants/color_constans.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/text_field.dart';
 import '../../widgets/button.dart';
@@ -48,33 +48,33 @@ class RegisterDetailScreen extends StatelessWidget {
               label: 'NIK',
               controller: controller.nikController,
               obscureText: false,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Nama Lengkap',
               controller: controller.nameController,
               obscureText: false,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.name,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Alamat',
               controller: controller.addressController,
               obscureText: false,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Nomor HP',
               controller: controller.phoneController,
               obscureText: false,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 32),
             Obx(
               () => MyButton(
-                onPressed:
+                onPressed: () =>
                     controller.isLoading.value
                         ? null
                         : controller.isFromGoogle

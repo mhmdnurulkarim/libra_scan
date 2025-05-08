@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
-import 'package:libra_scan/utils/color_constans.dart';
+import 'package:libra_scan/common/constants/color_constans.dart';
 
 import '../../controllers/auth_controller.dart';
 
@@ -82,7 +82,7 @@ class ProfileScreen extends StatelessWidget {
             // Tombol keluar
             Obx(
               () => MyButton(
-                onPressed: controller.logout,
+                onPressed: () => controller.logout,
                 color: ColorConstant.redColor,
                 child:
                     controller.isLoading.value

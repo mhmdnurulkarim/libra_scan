@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/text_field.dart';
-import 'package:libra_scan/utils/color_constans.dart';
+import 'package:libra_scan/common/constants/color_constans.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../widgets/button.dart';
@@ -31,7 +31,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Obx(
               () => MyButton(
-                onPressed:
+                onPressed: () =>
                     controller.isLoading.value
                         ? null
                         : controller.forgotPassword,

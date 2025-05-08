@@ -26,7 +26,7 @@ class MemberRequestCard extends StatelessWidget {
           width: 48,
           height: 48,
           color: Colors.grey[400],
-          child: const Icon(Icons.person, color: Colors.white),
+          child: const Icon(Icons.image, color: Colors.white),
         ),
         title: Text(name),
         subtitle: Text(id),

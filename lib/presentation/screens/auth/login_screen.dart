@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:libra_scan/presentation/widgets/text_field.dart';
 
-import '../../../utils/color_constans.dart';
+import '../../../common/constants/color_constans.dart';
 import '../../controllers/auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -82,7 +82,7 @@ class LoginScreen extends StatelessWidget {
                 // Tombol Login
                 Obx(
                   () => MyButton(
-                    onPressed:
+                    onPressed: () =>
                         controller.isLoading.value
                             ? null
                             : controller.loginWithEmail,

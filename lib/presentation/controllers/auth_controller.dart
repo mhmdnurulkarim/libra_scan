@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:libra_scan/presentation/widgets/snackbar.dart';
-import 'package:libra_scan/utils/color_constans.dart';
+import 'package:libra_scan/common/constants/color_constans.dart';
 
 class AuthController extends GetxController {
   final emailController = TextEditingController();
