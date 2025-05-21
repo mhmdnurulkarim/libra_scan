@@ -9,7 +9,7 @@ import 'package:libra_scan/common/constants/color_constans.dart';
 class AuthController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final nikController = TextEditingController();
+  final ninController = TextEditingController();
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final phoneController = TextEditingController();
@@ -21,8 +21,8 @@ class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Login menggunakan Email dan Password
-  Future<User?> loginWithEmail() async {
+  /// LOGIN - Email dan Password
+  Future<void> loginWithEmail() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
@@ -33,7 +33,7 @@ class AuthController extends GetxController {
         bgColor: ColorConstant.warningColor,
         icon: Icons.warning_amber_rounded,
       );
-      return null;
+      return;
     }
 
     try {
@@ -42,8 +42,40 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
+      userId = userCredential.user?.uid;
+      if (userId == null) throw FirebaseAuthException(code: 'invalid-user', message: 'User tidak ditemukan');
+
+      final snapshot = await _firestore
+          .collection('user')
+          .doc(userId)
+          .collection('account')
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        MySnackBar.show(
+          title: 'Error',
+          message: 'Data akun tidak ditemukan.',
+          bgColor: ColorConstant.redColor,
+          icon: Icons.error_outline,
+        );
+        return;
+      }
+
+      final accountData = snapshot.docs.first.data();
+
+      // Cek apakah akun aktif
+      if (accountData['status'] != true) {
+        MySnackBar.show(
+          title: 'Akun Nonaktif',
+          message: 'Akun Anda telah dinonaktifkan.',
+          bgColor: ColorConstant.redColor,
+          icon: Icons.block,
+        );
+        return;
+      }
+
       Get.offAllNamed('/main');
-      return userCredential.user;
     } catch (e) {
       MySnackBar.show(
         title: 'Login Gagal',
@@ -51,18 +83,18 @@ class AuthController extends GetxController {
         bgColor: ColorConstant.redColor,
         icon: Icons.error_outline,
       );
-      return null;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Login menggunakan Google Sign-In
-  Future<User?> loginWithGoogle() async {
+  /// LOGIN - Google
+  Future<void> loginWithGoogle() async {
     try {
       isLoading.value = true;
+
       final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return null;
+      if (googleUser == null) return;
 
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -74,30 +106,24 @@ class AuthController extends GetxController {
       final user = userCredential.user;
 
       if (user == null || user.email == null) {
-        MySnackBar.show(
-          title: 'Error',
-          message: 'Gagal mendapatkan data pengguna',
-          bgColor: ColorConstant.redColor,
-          icon: Icons.error,
-        );
-        return null;
+        throw FirebaseAuthException(code: 'user-not-found', message: 'Data pengguna tidak ditemukan');
       }
 
       userId = user.uid;
-      emailController.text = user.email!;
       isFromGoogle = true;
+      emailController.text = user.email!;
 
+      // Cek apakah akun sudah terdaftar di Firestore
       final userDoc = await _firestore.collection('user').doc(userId).get();
+
       if (userDoc.exists) {
         Get.offAllNamed('/main');
       } else {
-        Get.offAllNamed(
-          '/register-detail',
-          arguments: {'email': user.email!, 'user_id': user.uid},
-        );
+        Get.offAllNamed('/register-detail', arguments: {
+          'email': user.email!,
+          'user_id': user.uid
+        });
       }
-
-      return user;
     } catch (e) {
       MySnackBar.show(
         title: 'Google Sign-In Gagal',
@@ -105,22 +131,21 @@ class AuthController extends GetxController {
         bgColor: ColorConstant.redColor,
         icon: Icons.login,
       );
-      return null;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Register dengan Email & Password
+  /// REGISTER - Email dan Password
   Future<void> registerWithEmail() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
-    final nik = nikController.text.trim();
-    final nama = nameController.text.trim();
-    final alamat = addressController.text.trim();
-    final nomorHp = phoneController.text.trim();
+    final nin = ninController.text.trim();
+    final name = nameController.text.trim();
+    final address = addressController.text.trim();
+    final phone = phoneController.text.trim();
 
-    if ([email, password, nik, nama, alamat, nomorHp].any((e) => e.isEmpty)) {
+    if ([email, password, nin, name, address, phone].any((e) => e.isEmpty)) {
       MySnackBar.show(
         title: 'Peringatan',
         message: 'Semua field wajib diisi',
@@ -139,18 +164,29 @@ class AuthController extends GetxController {
       );
 
       final userId = userCredential.user?.uid;
-      final roleRef = _firestore.collection('role').doc('anggota');
+      final roleRef = _firestore.collection('roles').doc('anggota');
 
       await _firestore.collection('user').doc(userId).set({
         'user_id': userId,
+        'nin': nin,
+        'name': name,
+        'address': address,
+        'phone_number': phone,
+        'registration_date': FieldValue.serverTimestamp(),
+      });
+
+      final accountRef = await _firestore
+          .collection('user')
+          .doc(userId)
+          .collection('account')
+          .add({
         'email': email,
-        'nik': nik,
-        'nama': nama,
-        'alamat': alamat,
-        'nomor_hp': nomorHp,
-        'role': roleRef,
+        'role_id': roleRef,
         'status': true,
-        'tgl_registrasi': FieldValue.serverTimestamp(),
+      });
+
+      await accountRef.update({
+        'account_id': accountRef.id,
       });
 
       MySnackBar.show(
@@ -159,6 +195,7 @@ class AuthController extends GetxController {
         bgColor: ColorConstant.greenColor,
         icon: Icons.check_circle_outline,
       );
+
       Get.offNamed('/login');
     } catch (e) {
       MySnackBar.show(
@@ -167,24 +204,25 @@ class AuthController extends GetxController {
         bgColor: ColorConstant.redColor,
         icon: Icons.error_outline,
       );
+      return;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Register tambahan untuk pengguna Google
+  /// REGISTER - Google (lanjutan)
   Future<void> registerWithGoogle() async {
     final email = emailController.text.trim();
-    final nik = nikController.text.trim();
-    final nama = nameController.text.trim();
-    final alamat = addressController.text.trim();
-    final nomorHp = phoneController.text.trim();
     final password = passwordController.text;
+    final nin = ninController.text.trim();
+    final name = nameController.text.trim();
+    final address = addressController.text.trim();
+    final phone = phoneController.text.trim();
 
-    if ([nik, nama, alamat, nomorHp, password].any((e) => e.isEmpty)) {
+    if ([email, password, nin, name, address, phone].any((e) => e.isEmpty)) {
       MySnackBar.show(
         title: 'Peringatan',
-        message: 'Semua field dan password wajib diisi',
+        message: 'Semua data wajib diisi',
         bgColor: ColorConstant.warningColor,
         icon: Icons.warning,
       );
@@ -194,20 +232,32 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Simpan data pengguna ke Firestore
+      final roleRef = _firestore.collection('roles').doc('anggota');
+
       await _firestore.collection('user').doc(userId).set({
         'user_id': userId,
-        'email': email,
-        'nik': nik,
-        'nama': nama,
-        'alamat': alamat,
-        'nomor_hp': nomorHp,
-        'role': _firestore.collection('role').doc('anggota'),
-        'status': true,
-        'tgl_registrasi': FieldValue.serverTimestamp(),
+        'nin': nin,
+        'name': name,
+        'address': address,
+        'phone_number': phone,
+        'registration_date': FieldValue.serverTimestamp(),
       });
 
-      // Link akun Google dengan Email/Password
+      final accountRef = await _firestore
+          .collection('user')
+          .doc(userId)
+          .collection('account')
+          .add({
+        'email': email,
+        'role_id': roleRef,
+        'status': true,
+      });
+
+      await accountRef.update({
+        'account_id': accountRef.id,
+      });
+
+      // Tautkan email-password ke Google account
       final currentUser = _auth.currentUser;
       final emailCredential = EmailAuthProvider.credential(
         email: email,
@@ -218,55 +268,32 @@ class AuthController extends GetxController {
 
       MySnackBar.show(
         title: 'Sukses',
-        message: 'Akun Google berhasil terhubung ke Email/Password!',
+        message: 'Akun Google berhasil ditautkan!',
         bgColor: ColorConstant.greenColor,
         icon: Icons.check_circle_outline,
       );
 
       Get.offAllNamed('/main');
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'provider-already-linked') {
-        MySnackBar.show(
-          title: 'Info',
-          message: 'Akun sudah ditautkan sebelumnya.',
-          bgColor: Colors.blue,
-          icon: Icons.info_outline,
-        );
-      } else if (e.code == 'email-already-in-use') {
-        MySnackBar.show(
-          title: 'Gagal',
-          message: 'Email sudah digunakan oleh akun lain.',
-          bgColor: ColorConstant.redColor,
-          icon: Icons.error_outline,
-        );
-      } else {
-        MySnackBar.show(
-          title: 'Gagal Menautkan Akun',
-          message: e.message ?? 'Terjadi kesalahan',
-          bgColor: ColorConstant.redColor,
-          icon: Icons.error_outline,
-        );
-      }
     } catch (e) {
       MySnackBar.show(
-        title: 'Gagal Simpan Data',
+        title: 'Gagal',
         message: e.toString(),
         bgColor: ColorConstant.redColor,
         icon: Icons.error_outline,
       );
+      return;
     } finally {
       isLoading.value = false;
     }
   }
 
-
-  /// Reset Password
+  /// RESET PASSWORD
   Future<void> forgotPassword() async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
       MySnackBar.show(
         title: "Error",
-        message: "Email tidak boleh kosong",
+        message: "Email wajib diisi",
         bgColor: ColorConstant.redColor,
         icon: Icons.email_outlined,
       );
@@ -278,7 +305,7 @@ class AuthController extends GetxController {
       await _auth.sendPasswordResetEmail(email: email);
       MySnackBar.show(
         title: "Berhasil",
-        message: "Link reset telah dikirim ke email",
+        message: "Link reset telah dikirim",
         bgColor: ColorConstant.greenColor,
         icon: Icons.check_circle_outline,
       );
@@ -290,19 +317,19 @@ class AuthController extends GetxController {
         bgColor: ColorConstant.redColor,
         icon: Icons.error_outline,
       );
+      return;
+
     } finally {
       isLoading.value = false;
     }
   }
 
+  /// LOGOUT
   Future<void> logout() async {
     try {
       isLoading.value = true;
 
-      // Logout dari FirebaseAuth
       await _auth.signOut();
-
-      // Jika login menggunakan Google, logout dari GoogleSignIn juga
       if (isFromGoogle) {
         final googleSignIn = GoogleSignIn();
         if (await googleSignIn.isSignedIn()) {
@@ -311,14 +338,12 @@ class AuthController extends GetxController {
         isFromGoogle = false;
       }
 
-      // Reset semua controller
       emailController.clear();
       passwordController.clear();
-      nikController.clear();
+      ninController.clear();
       nameController.clear();
       addressController.clear();
       phoneController.clear();
-
       userId = null;
 
       MySnackBar.show(
@@ -340,5 +365,4 @@ class AuthController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }

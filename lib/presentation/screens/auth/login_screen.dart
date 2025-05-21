@@ -82,7 +82,7 @@ class LoginScreen extends StatelessWidget {
                 // Tombol Login
                 Obx(
                   () => MyButton(
-                    onPressed: () =>
+                    onPressed:
                         controller.isLoading.value
                             ? null
                             : controller.loginWithEmail,

@@ -31,7 +31,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Obx(
               () => MyButton(
-                onPressed: () =>
+                onPressed:
                     controller.isLoading.value
                         ? null
                         : controller.forgotPassword,

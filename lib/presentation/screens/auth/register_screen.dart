@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/auth_controller.dart';
+import '../../widgets/button.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -38,17 +39,9 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 16),
             const Text('atau'),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Get.toNamed('/register-detail');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            MyButton(
+              onPressed: () => Get.toNamed('/register-detail'),
+              color: const Color(0xFF2ECC71),
               child: const Text(
                 "Lanjutkan dengan email",
                 style: TextStyle(color: Colors.white),

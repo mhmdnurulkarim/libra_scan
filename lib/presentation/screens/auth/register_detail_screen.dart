@@ -46,7 +46,7 @@ class RegisterDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
             MyTextField(
               label: 'NIK',
-              controller: controller.nikController,
+              controller: controller.ninController,
               obscureText: false,
               keyboardType: TextInputType.text,
             ),
@@ -74,7 +74,7 @@ class RegisterDetailScreen extends StatelessWidget {
             const SizedBox(height: 32),
             Obx(
               () => MyButton(
-                onPressed: () =>
+                onPressed:
                     controller.isLoading.value
                         ? null
                         : controller.isFromGoogle

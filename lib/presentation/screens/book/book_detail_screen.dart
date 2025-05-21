@@ -4,12 +4,15 @@ import 'package:get/get.dart';
 import 'package:libra_scan/common/constants/color_constans.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 
+import '../../controllers/main_controller.dart';
+
 class BookDetailScreen extends StatelessWidget {
   const BookDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final data = Get.arguments as Map<String, dynamic>?;
+    final mainController = Get.find<MainScreenController>();
 
     if (data == null) {
       return const Scaffold(
@@ -91,18 +94,58 @@ class BookDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: MyButton(
-          onPressed: () =>
-            debugPrint('Pinjam/Booking/Kembali ditekan untuk buku: $title'),
-          color: ColorConstant.greenColor,
-          child: const Text(
-            'Pinjam/Booking/Kembali',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
+      bottomNavigationBar: Obx(() {
+        final role = mainController.role.value;
+
+        if (role == null) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (role == 'admin') {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MyButton(
+                  onPressed: () => debugPrint('Edit ditekan untuk buku: $title'),
+                  color: Colors.orange,
+                  child: const Text('Edit', style: TextStyle(color: Colors.white)),
+                ),
+                const SizedBox(height: 8),
+                MyButton(
+                  onPressed: () => debugPrint('Hapus ditekan untuk buku: $title'),
+                  color: Colors.red,
+                  child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MyButton(
+                  onPressed: () => debugPrint('Pinjam ditekan untuk buku: $title'),
+                  color: ColorConstant.greenColor,
+                  child: const Text('Pinjam', style: TextStyle(color: Colors.white)),
+                ),
+                const SizedBox(height: 8),
+                MyButton(
+                  onPressed: () => debugPrint('Booking ditekan untuk buku: $title'),
+                  color: Colors.blue,
+                  child: const Text('Booking', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
+          );
+        }
+      }),
     );
   }
 }

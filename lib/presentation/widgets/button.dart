@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MyButton extends StatelessWidget {
-  final Function onPressed;
+  final VoidCallback? onPressed;
   final Color color;
   final Widget child;
 
@@ -15,7 +15,7 @@ class MyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => onPressed(),
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         minimumSize: const Size(double.infinity, 48),

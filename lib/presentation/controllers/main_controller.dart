@@ -20,9 +20,21 @@ class MainScreenController extends GetxController {
     }
 
     try {
-      final userDoc =
-      await FirebaseFirestore.instance.collection('user').doc(userId).get();
-      final roleRef = userDoc.data()?['role'] as DocumentReference?;
+      final accountSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('account')
+          .limit(1)
+          .get();
+
+      if (accountSnapshot.docs.isEmpty) {
+        role.value = 'anggota';
+        return;
+      }
+
+      final accountData = accountSnapshot.docs.first.data();
+      final roleRef = accountData['role'] as DocumentReference?;
+
       if (roleRef != null) {
         final roleDoc = await roleRef.get();
         final roleData = roleDoc.data() as Map<String, dynamic>?;
