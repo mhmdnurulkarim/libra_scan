@@ -6,6 +6,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:libra_scan/presentation/widgets/snackbar.dart';
 import 'package:libra_scan/common/constants/color_constans.dart';
 
+import '../../data/share_preference.dart';
+
 class AuthController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -38,21 +40,42 @@ class AuthController extends GetxController {
 
     try {
       isLoading.value = true;
+
+      // Login ke Firebase Auth
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      userId = userCredential.user?.uid;
-      if (userId == null) throw FirebaseAuthException(code: 'invalid-user', message: 'User tidak ditemukan');
 
-      final snapshot = await _firestore
+      final user = userCredential.user;
+      if (user == null) {
+        throw FirebaseAuthException(code: 'invalid-user', message: 'User tidak ditemukan');
+      }
+
+      final userId = user.uid;
+
+      // Ambil data user utama
+      final userDoc = await _firestore.collection('user').doc(userId).get();
+      if (!userDoc.exists) {
+        MySnackBar.show(
+          title: 'Error',
+          message: 'Data pengguna tidak ditemukan.',
+          bgColor: ColorConstant.redColor,
+          icon: Icons.error_outline,
+        );
+        return;
+      }
+      final userData = userDoc.data()!;
+
+      // Ambil akun user dari subkoleksi account
+      final accountSnap = await _firestore
           .collection('user')
           .doc(userId)
           .collection('account')
           .limit(1)
           .get();
 
-      if (snapshot.docs.isEmpty) {
+      if (accountSnap.docs.isEmpty) {
         MySnackBar.show(
           title: 'Error',
           message: 'Data akun tidak ditemukan.',
@@ -62,9 +85,9 @@ class AuthController extends GetxController {
         return;
       }
 
-      final accountData = snapshot.docs.first.data();
+      final accountData = accountSnap.docs.first.data();
 
-      // Cek apakah akun aktif
+      // Cek status akun
       if (accountData['status'] != true) {
         MySnackBar.show(
           title: 'Akun Nonaktif',
@@ -75,11 +98,19 @@ class AuthController extends GetxController {
         return;
       }
 
+      // Simpan data lokal
+      await saveLoggedInUserData(
+        userId: userId,
+        userData: userData,
+        accountData: accountData,
+      );
+
+      // Pindah ke halaman utama
       Get.offAllNamed('/main');
     } catch (e) {
       MySnackBar.show(
         title: 'Login Gagal',
-        message: e.toString(),
+        message: e is FirebaseAuthException ? e.message ?? 'Terjadi kesalahan saat login.' : e.toString(),
         bgColor: ColorConstant.redColor,
         icon: Icons.error_outline,
       );
@@ -88,13 +119,16 @@ class AuthController extends GetxController {
     }
   }
 
+
   /// LOGIN - Google
   Future<void> loginWithGoogle() async {
     try {
       isLoading.value = true;
 
       final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
+      if (googleUser == null) {
+        throw FirebaseAuthException(code: 'sign-in-cancelled', message: 'Login dibatalkan oleh pengguna.');
+      }
 
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -106,28 +140,68 @@ class AuthController extends GetxController {
       final user = userCredential.user;
 
       if (user == null || user.email == null) {
-        throw FirebaseAuthException(code: 'user-not-found', message: 'Data pengguna tidak ditemukan');
+        throw FirebaseAuthException(code: 'user-not-found', message: 'Data pengguna tidak ditemukan.');
       }
 
-      userId = user.uid;
+      final userId = user.uid;
       isFromGoogle = true;
       emailController.text = user.email!;
 
-      // Cek apakah akun sudah terdaftar di Firestore
+      // Cek apakah user sudah ada di Firestore
       final userDoc = await _firestore.collection('user').doc(userId).get();
 
       if (userDoc.exists) {
+        final userData = userDoc.data()!;
+
+        final accountSnap = await _firestore
+            .collection('user')
+            .doc(userId)
+            .collection('account')
+            .limit(1)
+            .get();
+
+        if (accountSnap.docs.isEmpty) {
+          MySnackBar.show(
+            title: 'Error',
+            message: 'Data akun tidak ditemukan.',
+            bgColor: ColorConstant.redColor,
+            icon: Icons.error_outline,
+          );
+          return;
+        }
+
+        final accountData = accountSnap.docs.first.data();
+
+        // Cek apakah akun aktif
+        if (accountData['status'] != true) {
+          MySnackBar.show(
+            title: 'Akun Nonaktif',
+            message: 'Akun Anda telah dinonaktifkan.',
+            bgColor: ColorConstant.redColor,
+            icon: Icons.block,
+          );
+          return;
+        }
+
+        // Simpan data lokal
+        await saveLoggedInUserData(
+          userId: userId,
+          userData: userData,
+          accountData: accountData,
+        );
+
         Get.offAllNamed('/main');
       } else {
+        // User baru, arahkan ke register detail
         Get.offAllNamed('/register-detail', arguments: {
           'email': user.email!,
-          'user_id': user.uid
+          'user_id': userId,
         });
       }
     } catch (e) {
       MySnackBar.show(
         title: 'Google Sign-In Gagal',
-        message: e.toString(),
+        message: e is FirebaseAuthException ? e.message ?? 'Terjadi kesalahan saat login.' : e.toString(),
         bgColor: ColorConstant.redColor,
         icon: Icons.login,
       );
@@ -324,6 +398,26 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> saveLoggedInUserData({
+    required String userId,
+    required Map<String, dynamic> userData,
+    required Map<String, dynamic> accountData,
+  }) async {
+    await LocalStorage.saveUserData({
+      'user_id': userId,
+      'nin': userData['nin'] ?? '',
+      'name': userData['name'] ?? '',
+      'address': userData['address'] ?? '',
+      'phone_number': userData['phone_number'] ?? '',
+      'email': accountData['email'] ?? '',
+      'role_id': accountData['role_id'] is DocumentReference
+          ? (accountData['role_id'] as DocumentReference).id
+          : accountData['role_id'],
+      'status': '${accountData['status']}',
+    });
+  }
+
+
   /// LOGOUT
   Future<void> logout() async {
     try {
@@ -337,6 +431,8 @@ class AuthController extends GetxController {
         }
         isFromGoogle = false;
       }
+
+      await LocalStorage.clearUserData();
 
       emailController.clear();
       passwordController.clear();

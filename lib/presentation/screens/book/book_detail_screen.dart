@@ -23,7 +23,7 @@ class BookDetailScreen extends StatelessWidget {
     final String title = data['title'] ?? 'Judul Tidak Diketahui';
     final String isbn = data['isbn'] ?? '-';
     final String author = data['author'] ?? '-';
-    final kategoriRef = data['category_id'] as DocumentReference?;
+    final categoriseRef = data['category_id'] as DocumentReference?;
     final int stock = data['stock'] ?? 0;
     final String sinopsis = data['synopsis'] ?? 'Sinopsis tidak tersedia.';
 
@@ -58,7 +58,7 @@ class BookDetailScreen extends StatelessWidget {
                       Text(author, style: const TextStyle(color: Colors.black87)),
                       const SizedBox(height: 4),
                       FutureBuilder<DocumentSnapshot>(
-                        future: kategoriRef?.get(),
+                        future: categoriseRef?.get(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Text('Memuat kategori...');
@@ -68,7 +68,7 @@ class BookDetailScreen extends StatelessWidget {
                           }
                           final kategoriData = snapshot.data!.data() as Map<String, dynamic>?;
                           return Text(
-                            kategoriData?['name'] ?? 'Kategori Tidak Diketahui',
+                            kategoriData?['genre'] ?? 'Kategori Tidak Diketahui',
                             style: const TextStyle(color: Colors.black87),
                           );
                         },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../data/share_preference.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,10 +13,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      // Get.offNamed('/login');
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    final userData = await LocalStorage.getUserData();
+    final userId = userData['user_id'];
+
+    if (userId != null && userId != '') {
       Get.offNamed('/main');
-    });
+    } else {
+      Get.offNamed('/login');
+    }
   }
 
   @override

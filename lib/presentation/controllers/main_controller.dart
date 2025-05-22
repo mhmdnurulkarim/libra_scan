@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+
+import '../../data/share_preference.dart';
 
 class MainScreenController extends GetxController {
   var currentIndex = 0.obs;
@@ -13,38 +13,17 @@ class MainScreenController extends GetxController {
   }
 
   Future<void> loadUserRole() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      role.value = 'anggota';
-      return;
-    }
-
     try {
-      final accountSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('account')
-          .limit(1)
-          .get();
+      final userData = await LocalStorage.getUserData();
+      final roleId = userData['role_id']?.toLowerCase() ?? '';
 
-      if (accountSnapshot.docs.isEmpty) {
-        role.value = 'anggota';
-        return;
-      }
-
-      final accountData = accountSnapshot.docs.first.data();
-      final roleRef = accountData['role'] as DocumentReference?;
-
-      if (roleRef != null) {
-        final roleDoc = await roleRef.get();
-        final roleData = roleDoc.data() as Map<String, dynamic>?;
-        final roleName = (roleData?['name'] as String?)?.toLowerCase();
-        role.value = roleName ?? 'anggota';
+      if (roleId == 'admin') {
+        role.value = 'admin';
       } else {
         role.value = 'anggota';
       }
     } catch (e) {
-      print("Error fetching role: $e");
+      print("Error loading user data from local storage: $e");
       role.value = 'anggota';
     }
   }
