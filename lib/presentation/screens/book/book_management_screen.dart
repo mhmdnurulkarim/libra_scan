@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:libra_scan/presentation/widgets/text_field.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../controllers/book_controller.dart';
+import '../../widgets/snackbar.dart';
 
 class BookManagementScreen extends StatefulWidget {
   const BookManagementScreen({super.key});
@@ -16,6 +16,9 @@ class BookManagementScreen extends StatefulWidget {
 
 class _BookManagementScreenState extends State<BookManagementScreen> {
   final controller = Get.put(BookController());
+  Map<String, dynamic>? bookData;
+  String? bookDocId;
+  bool isFromSearch = false;
 
   final titleController = TextEditingController();
   final isbnController = TextEditingController();
@@ -26,8 +29,33 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
   final synopsisController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    final args = Get.arguments;
+    if (args != null && args is Map<String, dynamic>) {
+      if (args.containsKey('book')) {
+        bookData = args['book'];
+        bookDocId = bookData?['id']; // ambil ID dokumen
+      }
+      if (args['from'] == 'search') {
+        isFromSearch = true;
+      }
+    }
+
+    if (bookData != null) {
+      titleController.text = bookData?['title'] ?? '';
+      isbnController.text = bookData?['isbn'] ?? '';
+      authorController.text = bookData?['author'] ?? '';
+      categoryController.text = bookData?['category_id'] ?? '';
+      barcodeController.text = bookData?['barcode'] ?? '';
+      stockController.text = bookData?['stock']?.toString() ?? '';
+      synopsisController.text = bookData?['synopsis'] ?? '';
+    }
+  }
+
+  @override
   void dispose() {
-    // Bersihkan semua controller saat screen dihapus
     titleController.dispose();
     isbnController.dispose();
     authorController.dispose();
@@ -38,7 +66,22 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
     super.dispose();
   }
 
-  void _submitBook() {
+  void _submitBook() async {
+    if (titleController.text.isEmpty ||
+        isbnController.text.isEmpty ||
+        authorController.text.isEmpty ||
+        categoryController.text.isEmpty ||
+        barcodeController.text.isEmpty ||
+        stockController.text.isEmpty) {
+      MySnackBar.show(
+        title: 'Validasi Gagal',
+        message: 'Semua field wajib diisi kecuali sinopsis.',
+        bgColor: Colors.red,
+        icon: Icons.error,
+      );
+      return;
+    }
+
     final book = {
       'title': titleController.text,
       'isbn': isbnController.text,
@@ -49,7 +92,28 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
       'synopsis': synopsisController.text,
     };
 
-    controller.addBook(book);
+    if (bookDocId != null) {
+      await controller.updateBook(bookDocId!, book);
+    } else {
+      controller.addBook(book);
+    }
+  }
+
+  void _deleteBook() async {
+    final confirm = await Get.defaultDialog<bool>(
+      title: "Konfirmasi",
+      middleText: "Yakin ingin menghapus buku ini?",
+      textCancel: "Batal",
+      textConfirm: "Hapus",
+      confirmTextColor: Colors.white,
+      onConfirm: () => Get.back(result: true),
+      onCancel: () => Get.back(result: false),
+    );
+
+    if (confirm == true && bookDocId != null) {
+      await controller.deleteBook(bookDocId!);
+      Get.back(); // kembali ke halaman sebelumnya
+    }
   }
 
   @override
@@ -65,28 +129,28 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 MyTextField(
-                  label: "Judul",
+                  label: "Judul *",
                   obscureText: false,
                   keyboardType: TextInputType.text,
                   controller: titleController,
                 ),
                 const SizedBox(height: 12),
                 MyTextField(
-                  label: "ISBN",
+                  label: "ISBN *",
                   obscureText: false,
                   keyboardType: TextInputType.text,
                   controller: isbnController,
                 ),
                 const SizedBox(height: 12),
                 MyTextField(
-                  label: "Penulis",
+                  label: "Penulis *",
                   obscureText: false,
                   keyboardType: TextInputType.text,
                   controller: authorController,
                 ),
                 const SizedBox(height: 12),
                 MyTextField(
-                  label: "Kategori",
+                  label: "Kategori *",
                   obscureText: false,
                   keyboardType: TextInputType.text,
                   controller: categoryController,
@@ -97,7 +161,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                     Expanded(
                       flex: 2,
                       child: MyTextField(
-                        label: "Barcode",
+                        label: "Barcode *",
                         obscureText: false,
                         keyboardType: TextInputType.text,
                         controller: barcodeController,
@@ -109,13 +173,21 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                         backgroundColor: ColorConstant.greenColor,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 14,
+                          vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => Get.toNamed('/scanner'),
+                      onPressed: () async {
+                        final result = await Get.toNamed(
+                          '/scanner',
+                          arguments: {'from': 'management'},
+                        );
+                        if (result != null && result is String) {
+                          barcodeController.text = result;
+                        }
+                      },
                       child: Text(
                         'Scan Barcode',
                         style: TextStyle(color: ColorConstant.whiteColor),
@@ -125,7 +197,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                 ),
                 const SizedBox(height: 12),
                 MyTextField(
-                  label: "Stok Buku",
+                  label: "Stok Buku *",
                   obscureText: false,
                   keyboardType: TextInputType.number,
                   controller: stockController,
@@ -143,21 +215,20 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                   onPressed: _submitBook,
                   color: ColorConstant.greenColor,
                   child: Text(
-                    'Tambah',
+                    bookData != null ? 'Edit' : 'Tambah',
                     style: TextStyle(color: ColorConstant.whiteColor),
                   ),
                 ),
                 const SizedBox(height: 12),
-                MyButton(
-                  onPressed: () {
-                    // Tambahkan konfirmasi atau logika hapus
-                  },
-                  color: ColorConstant.redColor,
-                  child: Text(
-                    'Hapus',
-                    style: TextStyle(color: ColorConstant.whiteColor),
+                if (bookData != null && !isFromSearch)
+                  MyButton(
+                    onPressed: _deleteBook,
+                    color: ColorConstant.redColor,
+                    child: Text(
+                      'Hapus',
+                      style: TextStyle(color: ColorConstant.whiteColor),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

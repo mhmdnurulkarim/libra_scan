@@ -88,7 +88,9 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
         backgroundColor: ColorConstant.whiteColor,
         child: Icon(Icons.add, color: ColorConstant.blackColor),
         onPressed: () {
-          Get.toNamed('/book-management');
+          Get.toNamed('/book-management', arguments: {
+            'from': 'search',
+          });
         },
       ),
     );

@@ -111,7 +111,12 @@ class BookDetailScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 MyButton(
-                  onPressed: () => debugPrint('Edit ditekan untuk buku: $title'),
+                  onPressed: () {
+                    Get.toNamed('/book-management', arguments: {
+                      'book': data,
+                      'from': 'detail',
+                    });
+                  },
                   color: Colors.orange,
                   child: const Text('Edit', style: TextStyle(color: Colors.white)),
                 ),

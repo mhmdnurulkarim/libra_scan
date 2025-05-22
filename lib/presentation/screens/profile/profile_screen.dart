@@ -58,47 +58,63 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(accountData['nik'] ?? '-'),
-                            Text(
-                              accountData['nama'] ?? '-',
-                              style:
-                              const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(accountData['email'] ?? '-'),
-                            Text(accountData['nomor_hp'] ?? '-'),
+                        child: FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('user')
+                              .doc(userId)
+                              .get(),
+                          builder: (context, userSnapshot) {
+                            if (userSnapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
 
-                            // Role name
-                            FutureBuilder<DocumentSnapshot>(
-                              future: (accountData['role'] as DocumentReference)
-                                  .get(),
-                              builder: (context, roleSnapshot) {
-                                if (roleSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Text("Memuat peran...");
-                                }
-                                final roleName =
-                                (roleSnapshot.data?.data() as Map<String, dynamic>?)?['name'];
-                                return Text(roleName ?? 'Anggota');
-                              },
-                            ),
+                            if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                              return const Text("Data pengguna tidak ditemukan");
+                            }
 
-                            const SizedBox(height: 12),
-                            Center(
-                              child: Column(
-                                children: [
-                                  const SizedBox(
-                                    height: 40,
-                                    child: Placeholder(), // ganti barcode di sini
+                            final userData = userSnapshot.data!.data() as Map<String, dynamic>;
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(userData['nin'] ?? '-'),
+                                Text(
+                                  userData['name'] ?? '-',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(accountData['email'] ?? '-'),
+                                Text(userData['phone_number'] ?? '-'),
+
+                                // Role name
+                                FutureBuilder<DocumentSnapshot>(
+                                  future: (accountData['role_id'] as DocumentReference).get(),
+                                  builder: (context, roleSnapshot) {
+                                    if (roleSnapshot.connectionState == ConnectionState.waiting) {
+                                      return const Text("Memuat peran...");
+                                    }
+
+                                    final roleData = roleSnapshot.data?.data() as Map<String, dynamic>?;
+                                    final roleName = roleData?['name'] ?? 'Anggota';
+                                    return Text(roleName);
+                                  },
+                                ),
+
+                                const SizedBox(height: 12),
+                                Center(
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 40,
+                                        child: Placeholder(), // ganti dengan barcode jika perlu
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(userId ?? '-'),
+                                    ],
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(userId ?? '-'),
-                                ],
-                              ),
-                            ),
-                          ],
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -126,8 +142,10 @@ class ProfileScreen extends StatelessWidget {
                   color: ColorConstant.redColor,
                   child: authController.isLoading.value
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Keluar",
-                      style: TextStyle(color: Colors.white)),
+                      : const Text(
+                    "Keluar",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 )),
               ],
             );

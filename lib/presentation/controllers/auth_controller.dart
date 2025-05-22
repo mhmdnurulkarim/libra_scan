@@ -164,7 +164,7 @@ class AuthController extends GetxController {
       );
 
       final userId = userCredential.user?.uid;
-      final roleRef = _firestore.collection('roles').doc('anggota');
+      final roleRef = _firestore.collection('role').doc('anggota');
 
       await _firestore.collection('user').doc(userId).set({
         'user_id': userId,
@@ -232,7 +232,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      final roleRef = _firestore.collection('roles').doc('anggota');
+      final roleRef = _firestore.collection('role').doc('anggota');
 
       await _firestore.collection('user').doc(userId).set({
         'user_id': userId,

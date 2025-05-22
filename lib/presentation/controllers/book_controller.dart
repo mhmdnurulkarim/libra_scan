@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../widgets/snackbar.dart';
 
 class BookController extends GetxController {
   var listBook = <Map<String, dynamic>>[].obs;
@@ -46,23 +49,63 @@ class BookController extends GetxController {
 
   void addBook(Map<String, dynamic> book) async {
     try {
-      await _firestore.collection('book').add(book);
-      Get.snackbar('Sukses', 'Buku berhasil ditambahkan');
+      final docRef = await _firestore.collection('book').add(book);
+
+      // Tambahkan ID dokumen ke dalam dokumen (opsional, jika kamu perlu menyimpannya)
+      await docRef.update({'id': docRef.id});
+
+      MySnackBar.show(
+        title: 'Sukses',
+        message: 'Buku berhasil ditambahkan',
+        bgColor: Colors.green,
+        icon: Icons.check,
+      );
+
+      Get.back();
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menambahkan buku: $e');
+      MySnackBar.show(
+        title: 'Error',
+        message: 'Gagal menambahkan buku: $e',
+        bgColor: Colors.red,
+        icon: Icons.error,
+      );
     }
   }
 
 
-  void detailToEditBook(Map<String, dynamic> bookData) {
-
+  Future<void> updateBook(String id, Map<String, dynamic> data) async {
+    try {
+      await _firestore.collection('book').doc(id).update(data);
+      MySnackBar.show(
+        title: 'Berhasil',
+        message: 'Data buku diperbarui',
+        bgColor: Colors.green,
+      );
+    } catch (e) {
+      MySnackBar.show(
+        title: 'Error',
+        message: 'Gagal update: $e',
+        bgColor: Colors.red,
+        icon: Icons.error,
+      );
+    }
   }
 
-  void editBook(Map<String, dynamic> bookData) {
-
-  }
-
-  void deleteBook(String bookId) {
-
+  Future<void> deleteBook(String id) async {
+    try {
+      await _firestore.collection('book').doc(id).delete();
+      MySnackBar.show(
+        title: 'Berhasil',
+        message: 'Buku berhasil dihapus',
+        bgColor: Colors.green,
+      );
+    } catch (e) {
+      MySnackBar.show(
+        title: 'Error',
+        message: 'Gagal hapus: $e',
+        bgColor: Colors.red,
+        icon: Icons.error,
+      );
+    }
   }
 }
