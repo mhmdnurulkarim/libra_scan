@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:libra_scan/common/constants/color_constans.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 
+import '../../controllers/book_controller.dart';
 import '../../controllers/main_controller.dart';
 
 class BookDetailScreen extends StatelessWidget {
@@ -13,6 +14,7 @@ class BookDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = Get.arguments as Map<String, dynamic>?;
     final mainController = Get.find<MainScreenController>();
+    final controller = Get.put(BookController());
 
     if (data == null) {
       return const Scaffold(
@@ -66,9 +68,12 @@ class BookDetailScreen extends StatelessWidget {
                           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
                             return const Text('Kategori tidak ditemukan');
                           }
+                          
                           final kategoriData = snapshot.data!.data() as Map<String, dynamic>?;
+                          final categoryId = snapshot.data!.id;
+
                           return Text(
-                            kategoriData?['genre'] ?? 'Kategori Tidak Diketahui',
+                            '${categoryId} - ${kategoriData?['genre'] ?? 'Tidak Diketahui'}',
                             style: const TextStyle(color: Colors.black87),
                           );
                         },
@@ -107,26 +112,18 @@ class BookDetailScreen extends StatelessWidget {
         if (role == 'admin') {
           return Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MyButton(
-                  onPressed: () {
-                    Get.toNamed('/book-management', arguments: {
-                      'book': data,
-                      'from': 'detail',
-                    });
-                  },
-                  color: Colors.orange,
-                  child: const Text('Edit', style: TextStyle(color: Colors.white)),
-                ),
-                const SizedBox(height: 8),
-                MyButton(
-                  onPressed: () => debugPrint('Hapus ditekan untuk buku: $title'),
-                  color: Colors.red,
-                  child: const Text('Hapus', style: TextStyle(color: Colors.white)),
-                ),
-              ],
+            child: MyButton(
+              onPressed: () async {
+                final result = await Get.toNamed('/book-management', arguments: {
+                  'book': data,
+                  'from': 'detail',
+                });
+                if (result == true) {
+                  controller.fetchBooks();
+                }
+              },
+              color: Colors.green,
+              child: const Text('Edit', style: TextStyle(color: Colors.white)),
             ),
           );
         } else {

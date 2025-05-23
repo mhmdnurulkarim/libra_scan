@@ -47,6 +47,10 @@ class BookController extends GetxController {
     }
   }
 
+  Future<QuerySnapshot> getAllCategories() {
+    return _firestore.collection('category').get();
+  }
+
   void addBook(Map<String, dynamic> book) async {
     try {
       final docRef = await _firestore.collection('book').add(book);

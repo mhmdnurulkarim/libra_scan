@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:libra_scan/presentation/widgets/text_field.dart';
 
@@ -23,20 +24,23 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
   final titleController = TextEditingController();
   final isbnController = TextEditingController();
   final authorController = TextEditingController();
-  final categoryController = TextEditingController();
   final barcodeController = TextEditingController();
   final stockController = TextEditingController();
   final synopsisController = TextEditingController();
 
+  List<DocumentSnapshot> categories = [];
+  DocumentSnapshot? selectedCategory;
+
   @override
   void initState() {
     super.initState();
+    _loadCategories();
 
     final args = Get.arguments;
     if (args != null && args is Map<String, dynamic>) {
       if (args.containsKey('book')) {
         bookData = args['book'];
-        bookDocId = bookData?['id']; // ambil ID dokumen
+        bookDocId = bookData?['id'];
       }
       if (args['from'] == 'search') {
         isFromSearch = true;
@@ -47,11 +51,25 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
       titleController.text = bookData?['title'] ?? '';
       isbnController.text = bookData?['isbn'] ?? '';
       authorController.text = bookData?['author'] ?? '';
-      categoryController.text = bookData?['category_id'] ?? '';
       barcodeController.text = bookData?['barcode'] ?? '';
       stockController.text = bookData?['stock']?.toString() ?? '';
       synopsisController.text = bookData?['synopsis'] ?? '';
     }
+  }
+
+  void _loadCategories() async {
+    final snapshot = await controller.getAllCategories();
+    setState(() {
+      categories = snapshot.docs;
+
+      if (bookData != null && bookData!['category_id'] is DocumentReference) {
+        final currentRef = bookData!['category_id'] as DocumentReference;
+        selectedCategory = categories.firstWhere(
+              (cat) => cat.reference.path == currentRef.path,
+          orElse: () => categories.first,
+        );
+      }
+    });
   }
 
   @override
@@ -59,7 +77,6 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
     titleController.dispose();
     isbnController.dispose();
     authorController.dispose();
-    categoryController.dispose();
     barcodeController.dispose();
     stockController.dispose();
     synopsisController.dispose();
@@ -70,7 +87,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
     if (titleController.text.isEmpty ||
         isbnController.text.isEmpty ||
         authorController.text.isEmpty ||
-        categoryController.text.isEmpty ||
+        selectedCategory == null ||
         barcodeController.text.isEmpty ||
         stockController.text.isEmpty) {
       MySnackBar.show(
@@ -86,7 +103,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
       'title': titleController.text,
       'isbn': isbnController.text,
       'author': authorController.text,
-      'category_id': categoryController.text,
+      'category_id': selectedCategory!.reference,
       'barcode': barcodeController.text,
       'stock': int.tryParse(stockController.text) ?? 0,
       'synopsis': synopsisController.text,
@@ -97,6 +114,8 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
     } else {
       controller.addBook(book);
     }
+
+    Get.back(result: true);
   }
 
   void _deleteBook() async {
@@ -112,7 +131,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
 
     if (confirm == true && bookDocId != null) {
       await controller.deleteBook(bookDocId!);
-      Get.back(); // kembali ke halaman sebelumnya
+      Get.back();
     }
   }
 
@@ -149,11 +168,29 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                   controller: authorController,
                 ),
                 const SizedBox(height: 12),
-                MyTextField(
-                  label: "Kategori *",
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  controller: categoryController,
+                DropdownButtonFormField<DocumentSnapshot>(
+                  value: selectedCategory,
+                  items: categories.map((category) {
+                    final id = category.id;
+                    final genre = category['genre'];
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text('$id - $genre'),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCategory = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Kategori *',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(

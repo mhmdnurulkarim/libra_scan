@@ -87,10 +87,13 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: ColorConstant.whiteColor,
         child: Icon(Icons.add, color: ColorConstant.blackColor),
-        onPressed: () {
-          Get.toNamed('/book-management', arguments: {
+        onPressed: () async {
+          final result = await Get.toNamed('/book-management', arguments: {
             'from': 'search',
           });
+          if (result == true) {
+            controller.fetchBooks();
+          }
         },
       ),
     );

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../controllers/home_admin_controller.dart';
-import '../../widgets/member_request_card.dart';
+import '../../widgets/request_book_card.dart';
 
 class HomeAdminScreen extends StatelessWidget {
   HomeAdminScreen({super.key});
@@ -37,30 +37,40 @@ class HomeAdminScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Obx(() => Column(
-                  children: controller.loanRequests
-                      .map((member) => MemberRequestCard(
+            Obx(
+              () => Column(
+                children:
+                    controller.loanRequests
+                        .map(
+                          (member) => RequestBookCard(
                             name: member['name'] ?? '',
-                            id: member['id'] ?? '',
+                            email: member['email'] ?? '',
                             books: member['books'] ?? 0,
-                          ))
-                      .toList(),
-                )),
+                          ),
+                        )
+                        .toList(),
+              ),
+            ),
             const SizedBox(height: 24),
             const Text(
               'Permintaan booking buku:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Obx(() => Column(
-                  children: controller.bookingRequests
-                      .map((member) => MemberRequestCard(
+            Obx(
+              () => Column(
+                children:
+                    controller.bookingRequests
+                        .map(
+                          (member) => RequestBookCard(
                             name: member['name'] ?? '',
-                            id: member['id'] ?? '',
+                            email: member['email'] ?? '',
                             books: member['books'] ?? 0,
-                          ))
-                      .toList(),
-                )),
+                          ),
+                        )
+                        .toList(),
+              ),
+            ),
           ],
         ),
       ),
