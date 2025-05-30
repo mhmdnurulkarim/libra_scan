@@ -32,45 +32,60 @@ class HomeAdminScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+
+            // ------------------- PINJAMAN -------------------
             const Text(
               'Permintaan peminjaman buku:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Obx(
-              () => Column(
-                children:
-                    controller.loanRequests
-                        .map(
-                          (member) => RequestBookCard(
-                            name: member['name'] ?? '',
-                            email: member['email'] ?? '',
-                            books: member['books'] ?? 0,
-                          ),
-                        )
-                        .toList(),
-              ),
-            ),
+            Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (controller.loanRequests.isEmpty) {
+                return const Text('Tidak ada permintaan peminjaman buku.');
+              } else {
+                return Column(
+                  children: controller.loanRequests
+                      .map(
+                        (member) => RequestBookCard(
+                      name: member['name'] ?? '',
+                      email: member['email'] ?? '',
+                      books: member['book'] ?? 0,
+                    ),
+                  )
+                      .toList(),
+                );
+              }
+            }),
+
             const SizedBox(height: 24),
+
+            // ------------------- BOOKING -------------------
             const Text(
               'Permintaan booking buku:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Obx(
-              () => Column(
-                children:
-                    controller.bookingRequests
-                        .map(
-                          (member) => RequestBookCard(
-                            name: member['name'] ?? '',
-                            email: member['email'] ?? '',
-                            books: member['books'] ?? 0,
-                          ),
-                        )
-                        .toList(),
-              ),
-            ),
+            Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (controller.bookingRequests.isEmpty) {
+                return const Text('Tidak ada permintaan booking buku.');
+              } else {
+                return Column(
+                  children: controller.bookingRequests
+                      .map(
+                        (member) => RequestBookCard(
+                      name: member['name'] ?? '',
+                      email: member['email'] ?? '',
+                      books: member['book'] ?? 0,
+                    ),
+                  )
+                      .toList(),
+                );
+              }
+            }),
           ],
         ),
       ),

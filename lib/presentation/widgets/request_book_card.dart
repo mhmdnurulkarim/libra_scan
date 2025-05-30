@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class RequestBookCard extends StatelessWidget {
   final String name;
-  final String email;
+  final String? email;
+  final Timestamp? date;
   final int books;
   final VoidCallback? onTap;
 
   const RequestBookCard({
     super.key,
     required this.name,
-    required this.email,
+    this.email,
+    this.date,
     required this.books,
     this.onTap,
   });
@@ -37,9 +41,20 @@ class RequestBookCard extends StatelessWidget {
           name,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(
-          email,
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (email != null)
+              Text(
+                email!,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            if (date != null)
+              Text(
+                _formatDate(date!),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+          ],
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,5 +72,10 @@ class RequestBookCard extends StatelessWidget {
         onTap: onTap,
       ),
     );
+  }
+
+  String _formatDate(Timestamp timestamp) {
+    final dateTime = timestamp.toDate();
+    return DateFormat('dd MMM yyyy').format(dateTime);
   }
 }

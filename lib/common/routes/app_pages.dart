@@ -12,4 +12,5 @@ class AppRoutes {
   static const transactionUser = '/transaction-user';
   static const transactionAdmin = '/transaction-admin';
   static const report = '/report';
+  static const aboutDev = '/about';
 }

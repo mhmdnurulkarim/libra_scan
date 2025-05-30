@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/common/constants/color_constans.dart';
+import 'package:libra_scan/presentation/screens/search/search_user_screen.dart';
 
 import '../controllers/main_controller.dart';
 import 'home/home_admin_screen.dart';
+import 'home/home_user_screen.dart';
 import 'profile/profile_screen.dart';
 import 'search/search_admin_screen.dart';
 
@@ -21,17 +23,17 @@ class MainScreen extends StatelessWidget {
 
       final isAdmin = controller.role.value == 'admin';
 
-      // final children = [
-      //   isAdmin ? HomeAdminScreen() : HomeUserScreen(),
-      //   isAdmin ? SearchAdminScreen() : SearchUserScreen(),
-      //   ProfileScreen(),
-      // ];
-
       final children = [
-        isAdmin ? HomeAdminScreen() : HomeAdminScreen(),
-        isAdmin ? SearchAdminScreen() : SearchAdminScreen(),
+        isAdmin ? HomeAdminScreen() : HomeUserScreen(),
+        isAdmin ? SearchAdminScreen() : SearchUserScreen(),
         ProfileScreen(),
       ];
+
+      // final children = [
+      //   isAdmin ? HomeAdminScreen() : HomeAdminScreen(),
+      //   isAdmin ? SearchAdminScreen() : SearchAdminScreen(),
+      //   ProfileScreen(),
+      // ];
 
       return Scaffold(
         body: children[controller.currentIndex.value],

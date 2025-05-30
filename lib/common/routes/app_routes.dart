@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/screens/main_screen.dart';
-import 'package:libra_scan/presentation/screens/report/report_screen.dart';
 
 import '../../presentation/screens/auth/forgot_password.dart';
 import '../../presentation/screens/auth/login_screen.dart';
@@ -8,10 +7,12 @@ import '../../presentation/screens/auth/register_detail_screen.dart';
 import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/book/book_detail_screen.dart';
 import '../../presentation/screens/book/book_management_screen.dart';
-import '../../presentation/widgets/scanner_screen.dart';
+import '../../presentation/screens/profile/about_screen.dart';
+import '../../presentation/screens/report/report_screen.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/transaction/transaction_admin_screen.dart';
 import '../../presentation/screens/transaction/transaction_user_screen.dart';
+import '../../presentation/widgets/scanner_screen.dart';
 import 'app_pages.dart';
 
 class AppPages {
@@ -43,5 +44,6 @@ class AppPages {
       page: () => const TransactionAdminScreen(),
     ),
     GetPage(name: AppRoutes.report, page: () => const ReportScreen()),
+    GetPage(name: AppRoutes.aboutDev, page: () => const AboutScreen()),
   ];
 }

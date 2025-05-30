@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
+import '../../data/share_preference.dart';
+
 class HomeUserController extends GetxController {
-  var currentLoans = <Map<String, dynamic>>[].obs;
+  var currentTransactions = <Map<String, dynamic>>[].obs;
   var pastLoans = <Map<String, dynamic>>[].obs;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,35 +12,84 @@ class HomeUserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchBooks();
+    fetchUserTransactions();
   }
 
-  void fetchBooks() async {
+  Future<void> fetchUserTransactions() async {
     try {
-      final snapshot = await _firestore.collection('book').get();
+      final userData = await LocalStorage.getUserData();
+      final userId = userData['user_id'];
 
-      currentLoans.value = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return {
-          'id': doc.id,
-          'title': data['title'] ?? '',
-          'author': data['author'] ?? '',
-          'isbn': data['isbn'] ?? '',
-          'barcode': data['barcode'] ?? '',
-          'stock': data['stock'] ?? 0,
-          'synopsis': data['synopsis'] ?? '',
-          'category_id': data['category_id'],
-        };
-      }).toList();
+      if (userId == null || userId.isEmpty) {
+        print('User ID not found in local storage');
+        return;
+      }
 
-      // Jika ingin memisahkan pinjaman sebelumnya, bisa logikakan berdasarkan timestamp/status
-      pastLoans.value = []; // Kosong dulu
+      final transactionsSnapshot = await _firestore
+          .collection('transaction')
+          .where('user_id', isEqualTo: _firestore.doc('user/$userId'))
+          .get();
+
+      List<Map<String, dynamic>> current = [];
+      List<Map<String, dynamic>> past = [];
+
+      for (var transaction in transactionsSnapshot.docs) {
+        final transactionData = transaction.data();
+        final createdAt = transactionData['created_at'] as Timestamp?;
+        final transactionId = transaction.id;
+
+        final detailsSnapshot = await _firestore
+            .collection('transaction')
+            .doc(transactionId)
+            .collection('transaction_detail')
+            .get();
+
+        int currentCount = 0;
+
+        for (var detail in detailsSnapshot.docs) {
+          final detailData = detail.data();
+          final status = detailData['status'] ?? '';
+          final bookRef = detailData['book_id'] as DocumentReference?;
+
+          if (status == 'borrowed' || status == 'pending') {
+            currentCount++;
+          }
+
+          if (status == 'returned' && bookRef != null) {
+            final bookSnapshot = await bookRef.get();
+            if (bookSnapshot.exists) {
+              final bookData = bookSnapshot.data() as Map<String, dynamic>;
+              past.add({
+                'title': bookData['title'] ?? '',
+                'author': bookData['author'] ?? '',
+                'id': bookSnapshot.id,
+                'book': bookData,
+              });
+            }
+          }
+        }
+
+        if (currentCount > 0) {
+          current.add({
+            'transaction_id': transactionId,
+            'created_at': createdAt,
+            'book_count': currentCount,
+          });
+        }
+      }
+
+      currentTransactions.value = current;
+      pastLoans.value = past;
     } catch (e) {
-      print('Error fetching books: $e');
+      print('Error fetching user transactions: $e');
     }
   }
 
-  void goToDetail(Map<String, dynamic> bookData) {
-    Get.toNamed('/book-detail', arguments: bookData);
+  void goToDetail(dynamic data) {
+    if (data is String) {
+      Get.toNamed('/transaction-user', arguments: {'transaction_id': data});
+    } else {
+      Get.toNamed('/transaction-user', arguments: data);
+    }
   }
 }

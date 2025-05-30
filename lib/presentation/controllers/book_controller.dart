@@ -55,7 +55,6 @@ class BookController extends GetxController {
     try {
       final docRef = await _firestore.collection('book').add(book);
 
-      // Tambahkan ID dokumen ke dalam dokumen (opsional, jika kamu perlu menyimpannya)
       await docRef.update({'id': docRef.id});
 
       MySnackBar.show(

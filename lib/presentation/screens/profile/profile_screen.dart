@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:libra_scan/common/constants/color_constans.dart';
-import 'package:libra_scan/presentation/widgets/button.dart';
 
+import '../../../common/constants/color_constans.dart';
 import '../../../data/share_preference.dart';
+import '../../../utils/locale_controller.dart';
 import '../../controllers/auth_controller.dart';
+import '../../widgets/button.dart';
+import '../../widgets/snackbar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -12,6 +14,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.put(AuthController());
+    final localeController = Get.find<LocaleController>();
 
     return FutureBuilder<Map<String, String>>(
       future: LocalStorage.getUserData(),
@@ -97,19 +100,53 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Pengaturan
-                settingItem('Bahasa Indonesia', onTap: () {}),
-                SwitchListTile(
-                  title: const Text('Tema Gelap'),
-                  value: false,
-                  onChanged: (val) {
-                    // Tambahkan logika dark mode
+                settingItem(
+                  'Bahasa Indonesia',
+                  onTap: () {
+                    MySnackBar.show(
+                      title: 'Dalam Pengembangan',
+                      message: 'Fitur ini sedang dalam pengembangan',
+                      bgColor: ColorConstant.warningColor,
+                      icon: Icons.warning_amber_rounded,
+                    );
                   },
                 ),
-                settingItem('Laporan', onTap: () {}),
-                settingItem('Tentang Developer', onTap: () {}),
-
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 16),
+                Obx(
+                  () => SwitchListTile(
+                    title: const Text('Tema Gelap'),
+                    value: localeController.themeMode.value == ThemeMode.dark,
+                    onChanged: (val) {
+                      localeController.toggleTheme(val);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                settingItem(
+                  'Laporan',
+                  onTap: () {
+                    MySnackBar.show(
+                      title: 'Dalam Pengembangan',
+                      message: 'Fitur ini sedang dalam pengembangan',
+                      bgColor: ColorConstant.warningColor,
+                      icon: Icons.warning_amber_rounded,
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                settingItem(
+                  'Tentang Developer',
+                  onTap: () {
+                    MySnackBar.show(
+                      title: 'Dalam Pengembangan',
+                      message: 'Fitur ini sedang dalam pengembangan',
+                      bgColor: ColorConstant.warningColor,
+                      icon: Icons.warning_amber_rounded,
+                    );
+                    // Get.toNamed("/about");
+                  },
+                ),
+                const SizedBox(height: 16),
                 // Tombol keluar
                 Obx(
                   () => MyButton(

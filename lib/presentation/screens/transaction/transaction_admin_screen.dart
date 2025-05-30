@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:libra_scan/presentation/controllers/transaction_controller.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../widgets/button.dart';
 
-class TransactionAdminScreen extends StatelessWidget {
+class TransactionAdminScreen extends StatefulWidget {
   const TransactionAdminScreen({super.key});
+
+  @override
+  State<TransactionAdminScreen> createState() => _TransactionAdminScreenState();
+}
+
+class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
+  final controller = Get.put(TransactionController());
+
+  @override
+  void initState() {
+    super.initState();
+    final transactionId = Get.arguments['transactionId'];
+    controller.loadTransactionData(transactionId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +35,7 @@ class TransactionAdminScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: Obx(() => Column(
           children: [
             _buildMemberCard(),
             const SizedBox(height: 16),
@@ -28,20 +44,19 @@ class TransactionAdminScreen extends StatelessWidget {
             const Text(
               'Denda masih 3 Hari lagi\nHingga tanggal 27 April 2025',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const Spacer(),
             _buildActionButton(),
           ],
-        ),
+        )),
       ),
     );
   }
 
   Widget _buildMemberCard() {
+    final member = controller.memberData;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -62,12 +77,13 @@ class TransactionAdminScreen extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('12345679034395', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Muhammad Nurul Karim'),
-                    Text('abc@gmail.com'),
-                    Text('085769143295'),
-                    Text('Anggota'),
+                  children: [
+                    Text(member['nin'] ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(member['name'] ?? ''),
+                    Text(member['email'] ?? ''),
+                    Text(member['phone_number'] ?? ''),
+                    const Text('Anggota'),
                   ],
                 ),
               ),
@@ -78,10 +94,11 @@ class TransactionAdminScreen extends StatelessWidget {
             width: double.infinity,
             height: 60,
             color: Colors.white,
-            child: Center(child: Text('Barcode Image')),
+            child: const Center(child: Text('Barcode Image')),
           ),
           const SizedBox(height: 4),
-          const Text('24110900009', style: TextStyle(fontSize: 14)),
+          Text(member['barcode'] ?? '',
+              style: const TextStyle(fontSize: 14)),
         ],
       ),
     );
@@ -89,56 +106,72 @@ class TransactionAdminScreen extends StatelessWidget {
 
   Widget _buildBookList() {
     return Column(
-      children: List.generate(3, (index) => _buildBookItem()),
-    );
-  }
-
-  Widget _buildBookItem() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.purple[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            color: Colors.grey[300],
-            child: const Icon(Icons.book),
+      children: controller.bookList.map((book) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            borderRadius: BorderRadius.circular(12),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Judul Buku', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Penulis Buku'),
-              ],
-            ),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                color: Colors.grey[300],
+                child: const Icon(Icons.book),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(book['title'] ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(book['author'] ?? ''),
+                    Text("Status: ${book['status']}"),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const Icon(Icons.chevron_right),
-        ],
-      ),
+        );
+      }).toList(),
     );
   }
 
   Widget _buildActionButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: MyButton(
-        onPressed: () {
-          // logika pinjam / booking / kembali
-          debugPrint('Pinjam/Booking/Kembali ditekan');
-        },
-        color: ColorConstant.greenColor,
-        child: const Text(
-          'Pinjam/Booking/Kembali',
-          style: TextStyle(color: Colors.white),
+    return Obx(() {
+      if (controller.bookList.isEmpty) return const SizedBox();
+
+      String buttonText = '';
+      VoidCallback? action;
+
+      if (controller.allReturned) {
+        return const Text(
+          'Semua buku telah dikembalikan.',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        );
+      } else if (controller.allBorrowed) {
+        buttonText = 'Kembalikan Buku';
+        action = controller.returnBooks;
+      } else {
+        buttonText = 'Setujui Transaksi';
+        action = controller.approveTransaction;
+      }
+
+      return SizedBox(
+        width: double.infinity,
+        child: MyButton(
+          onPressed: action,
+          color: ColorConstant.greenColor,
+          child: Text(
+            buttonText,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
