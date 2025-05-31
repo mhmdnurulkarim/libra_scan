@@ -174,7 +174,7 @@ class TransactionController extends GetxController {
     }
   }
 
-  Future<Map<String, dynamic>> loadTransactionData(String id) async {
+  Future<Map<String, dynamic>> loadTransactionData(String id, {bool isAdmin = false}) async {
     transactionId.value = id;
     final Map<String, dynamic> result = {};
 
@@ -184,6 +184,21 @@ class TransactionController extends GetxController {
       if (transactionData == null) return {};
 
       result['transaction'] = transactionData;
+
+      final userRef = transactionData['user_id'] as DocumentReference?;
+      if (userRef != null && isAdmin) {
+        final userSnapshot = await userRef.get();
+        if (userSnapshot.exists) {
+          memberData.value = {
+            'nin': userSnapshot['nin'],
+            'name': userSnapshot['name'],
+            'email': userSnapshot['email'],
+            'phone_number': userSnapshot['phone_number'],
+            'role': userSnapshot['role_id'],
+            'barcode': userSnapshot['barcode'] ?? '',
+          };
+        }
+      }
 
       final detailSnapshot = await _firestore
           .collection('transaction')
@@ -215,7 +230,6 @@ class TransactionController extends GetxController {
 
     return result;
   }
-
 
   Future<void> approveTransaction() async {
     if (transactionId.value.isEmpty) return;

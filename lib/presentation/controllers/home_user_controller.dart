@@ -52,7 +52,6 @@ class HomeUserController extends GetxController {
           'status': statusTransaction,
         };
 
-        // Pisahkan berdasarkan status_transaction
         if (statusTransaction == 'returned') {
           past.add(item);
         } else {

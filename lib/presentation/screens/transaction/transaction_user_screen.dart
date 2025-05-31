@@ -5,6 +5,7 @@ import 'package:libra_scan/common/constants/color_constans.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 
 import '../../controllers/transaction_controller.dart';
+import '../../widgets/book_card.dart';
 
 class TransactionUserScreen extends StatefulWidget {
   const TransactionUserScreen({super.key});
@@ -55,13 +56,17 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                   padding: const EdgeInsets.all(16),
                   children: [
                     ...books.map(
-                      (book) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          tileColor: Colors.purple.shade50,
-                          leading: const Icon(Icons.book),
-                          title: Text(book['title'] ?? 'Tanpa Judul'),
-                          subtitle: Text(book['author'] ?? 'Tanpa Penulis'),
+                          (book) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                        child: BookCard(
+                          title: book['title'],
+                          author: book['author'],
+                          onTap: () {
+                            Get.toNamed('/book-detail', arguments: book);
+                          },
                         ),
                       ),
                     ),
@@ -79,18 +84,19 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                   ],
                 ),
               ),
-              Padding(
+
+              currentStatus != 'borrowed'
+                  ? Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     MyButton(
-                      onPressed:
-                          () =>
-                              transactionController.userUpdateTransactionStatus(
-                                transactionId,
-                                'waiting for borrow',
-                              ),
+                      onPressed: () => transactionController
+                          .userUpdateTransactionStatus(
+                        transactionId,
+                        'waiting for borrow',
+                      ),
                       color: ColorConstant.greenColor,
                       child: const Text(
                         'Ajukan Peminjaman',
@@ -99,12 +105,11 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                     ),
                     const SizedBox(height: 12),
                     MyButton(
-                      onPressed:
-                          () =>
-                              transactionController.userUpdateTransactionStatus(
-                                transactionId,
-                                'waiting for booking',
-                              ),
+                      onPressed: () => transactionController
+                          .userUpdateTransactionStatus(
+                        transactionId,
+                        'waiting for booking',
+                      ),
                       color: ColorConstant.primaryColor,
                       child: const Text(
                         'Ajukan Booking',
@@ -112,6 +117,21 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                       ),
                     ),
                   ],
+                ),
+              )
+                  : Padding(
+                padding: const EdgeInsets.all(16),
+                child: MyButton(
+                  onPressed: () => transactionController
+                      .userUpdateTransactionStatus(
+                    transactionId,
+                    'waiting for return',
+                  ),
+                  color: ColorConstant.greenColor,
+                  child: const Text(
+                    'Ajukan Pengembalian',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],

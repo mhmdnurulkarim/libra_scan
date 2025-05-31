@@ -33,7 +33,6 @@ class HomeAdminScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // ------------------- PINJAMAN -------------------
             const Text(
               'Permintaan peminjaman buku:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -42,26 +41,28 @@ class HomeAdminScreen extends StatelessWidget {
             Obx(() {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (controller.loanRequests.isEmpty) {
+              } else if (controller.borrowRequests.isEmpty) {
                 return const Text('Tidak ada permintaan peminjaman buku.');
               } else {
                 return Column(
-                  children: controller.loanRequests
-                      .map(
-                        (member) => RequestBookCard(
-                      name: member['name'] ?? '',
-                      email: member['email'] ?? '',
-                      books: member['book'] ?? 0,
-                    ),
-                  )
-                      .toList(),
+                  children:
+                      controller.borrowRequests
+                          .map(
+                            (member) => RequestBookCard(
+                              name: member['name'] ?? '',
+                              email: member['email'] ?? '',
+                              books: member['book'] ?? 0,
+                              onTap:
+                                  () => controller.goToDetail(
+                                    member['transaction_id'],
+                                  ),
+                            ),
+                          )
+                          .toList(),
                 );
               }
             }),
-
             const SizedBox(height: 24),
-
-            // ------------------- BOOKING -------------------
             const Text(
               'Permintaan booking buku:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -74,15 +75,20 @@ class HomeAdminScreen extends StatelessWidget {
                 return const Text('Tidak ada permintaan booking buku.');
               } else {
                 return Column(
-                  children: controller.bookingRequests
-                      .map(
-                        (member) => RequestBookCard(
-                      name: member['name'] ?? '',
-                      email: member['email'] ?? '',
-                      books: member['book'] ?? 0,
-                    ),
-                  )
-                      .toList(),
+                  children:
+                      controller.bookingRequests
+                          .map(
+                            (member) => RequestBookCard(
+                              name: member['name'] ?? '',
+                              email: member['email'] ?? '',
+                              books: member['book'] ?? 0,
+                              onTap:
+                                  () => controller.goToDetail(
+                                    member['transaction_id'],
+                                  ),
+                            ),
+                          )
+                          .toList(),
                 );
               }
             }),

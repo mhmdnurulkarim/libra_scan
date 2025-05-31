@@ -19,7 +19,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
   void initState() {
     super.initState();
     final transactionId = Get.arguments['transactionId'];
-    controller.loadTransactionData(transactionId);
+    controller.loadTransactionData(transactionId, isAdmin: true);
   }
 
   @override
