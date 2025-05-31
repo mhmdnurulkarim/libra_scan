@@ -229,7 +229,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 const SizedBox(height: 16),
                 MyButton(
                   onPressed: () {
-                    transactionController.isBooking.value = false;
                     transactionController.submitTransaction(
                       userId: userId,
                       book: data!,
@@ -237,20 +236,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     );
                   },
                   color: ColorConstant.greenColor,
-                  child: const Text('Pinjam', style: TextStyle(color: Colors.white)),
-                ),
-                const SizedBox(height: 8),
-                MyButton(
-                  onPressed: () {
-                    transactionController.isBooking.value = true;
-                    transactionController.submitTransaction(
-                      userId: userId,
-                      book: data!,
-                      quantity: quantity,
-                    );
-                  },
-                  color: Colors.blue,
-                  child: const Text('Booking', style: TextStyle(color: Colors.white)),
+                  child: const Text('Ingin Pinjam', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../controllers/home_user_controller.dart';
@@ -51,15 +51,16 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
               }
 
               return Column(
-                children: transactions.map((tx) {
-                  return RequestBookCard(
-                    name: 'Transaksi Aktif',
-                    email: null,
-                    date: tx['created_at'] as Timestamp?,
-                    books: tx['book_count'] ?? 0,
-                    onTap: () => controller.goToDetail(tx['transaction_id']),
-                  );
-                }).toList(),
+                children:
+                    transactions.map((tx) {
+                      return RequestBookCard(
+                        name: tx['name'] ?? 'User',
+                        date: tx['created_at'] as Timestamp?,
+                        books: tx['book_count'] ?? 0,
+                        onTap:
+                            () => controller.goToDetail(tx['transaction_id']),
+                      );
+                    }).toList(),
               );
             }),
             const SizedBox(height: 24),
@@ -76,15 +77,16 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
               }
 
               return Column(
-                children: past.map((loan) {
-                  return RequestBookCard(
-                    name: loan['title'] ?? '',
-                    email: loan['author'] ?? '',
-                    date: null,
-                    books: 1,
-                    onTap: () => controller.goToDetail(loan),
-                  );
-                }).toList(),
+                children:
+                    past.map((tx) {
+                      return RequestBookCard(
+                        name: tx['name'] ?? 'User',
+                        date: tx['created_at'] as Timestamp?,
+                        books: tx['book_count'] ?? 0,
+                        onTap:
+                            () => controller.goToDetail(tx['transaction_id']),
+                      );
+                    }).toList(),
               );
             }),
           ],

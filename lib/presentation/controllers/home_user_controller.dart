@@ -19,11 +19,7 @@ class HomeUserController extends GetxController {
     try {
       final userData = await LocalStorage.getUserData();
       final userId = userData['user_id'];
-
-      if (userId == null || userId.isEmpty) {
-        print('User ID not found in local storage');
-        return;
-      }
+      final userName = userData['name'];
 
       final transactionsSnapshot = await _firestore
           .collection('transaction')
@@ -35,46 +31,32 @@ class HomeUserController extends GetxController {
 
       for (var transaction in transactionsSnapshot.docs) {
         final transactionData = transaction.data();
-        final createdAt = transactionData['created_at'] as Timestamp?;
+        final createdAt = transactionData['borrow_date'] as Timestamp?;
         final transactionId = transaction.id;
+        final statusTransaction = transactionData['status_transaction'] as String? ?? 'draft';
 
-        final detailsSnapshot = await _firestore
-            .collection('transaction')
-            .doc(transactionId)
-            .collection('transaction_detail')
-            .get();
+        final detailsSnapshot = await transaction.reference.collection('transaction_detail').get();
 
-        int currentCount = 0;
-
+        int totalQty = 0;
         for (var detail in detailsSnapshot.docs) {
-          final detailData = detail.data();
-          final status = detailData['status'] ?? '';
-          final bookRef = detailData['book_id'] as DocumentReference?;
-
-          if (status == 'borrowed' || status == 'pending') {
-            currentCount++;
-          }
-
-          if (status == 'returned' && bookRef != null) {
-            final bookSnapshot = await bookRef.get();
-            if (bookSnapshot.exists) {
-              final bookData = bookSnapshot.data() as Map<String, dynamic>;
-              past.add({
-                'title': bookData['title'] ?? '',
-                'author': bookData['author'] ?? '',
-                'id': bookSnapshot.id,
-                'book': bookData,
-              });
-            }
-          }
+          final data = detail.data();
+          final qty = (data['quantity'] is num) ? (data['quantity'] as num).toInt() : 1;
+          totalQty += qty;
         }
 
-        if (currentCount > 0) {
-          current.add({
-            'transaction_id': transactionId,
-            'created_at': createdAt,
-            'book_count': currentCount,
-          });
+        final item = {
+          'transaction_id': transactionId,
+          'created_at': createdAt,
+          'book_count': totalQty,
+          'name': userName,
+          'status': statusTransaction,
+        };
+
+        // Pisahkan berdasarkan status_transaction
+        if (statusTransaction == 'returned') {
+          past.add(item);
+        } else {
+          current.add(item);
         }
       }
 
@@ -85,11 +67,7 @@ class HomeUserController extends GetxController {
     }
   }
 
-  void goToDetail(dynamic data) {
-    if (data is String) {
-      Get.toNamed('/transaction-user', arguments: {'transaction_id': data});
-    } else {
-      Get.toNamed('/transaction-user', arguments: data);
-    }
+  void goToDetail(String transactionId) {
+    Get.toNamed('/transaction-user', arguments: {'transaction_id': transactionId});
   }
 }

@@ -17,7 +17,7 @@ class BookController extends GetxController {
       final books = snapshot.docs.map((doc) {
         final data = doc.data();
         return {
-          'id': doc.id,
+          'book_id': doc.id,
           'title': data['title'] ?? '',
           'author': data['author'] ?? '',
           'isbn': data['isbn'] ?? '',
@@ -55,7 +55,7 @@ class BookController extends GetxController {
     try {
       final docRef = await _firestore.collection('book').add(book);
 
-      await docRef.update({'id': docRef.id});
+      await docRef.update({'book_id': docRef.id});
 
       MySnackBar.show(
         title: 'Sukses',

@@ -2,110 +2,122 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/common/constants/color_constans.dart';
-import 'package:libra_scan/data/share_preference.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 
-class TransactionUserScreen extends StatelessWidget {
+import '../../controllers/transaction_controller.dart';
+
+class TransactionUserScreen extends StatefulWidget {
   const TransactionUserScreen({super.key});
 
   @override
+  State<TransactionUserScreen> createState() => _TransactionUserScreenState();
+}
+
+class _TransactionUserScreenState extends State<TransactionUserScreen> {
+  final transactionController = Get.put(TransactionController());
+
+  @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> selectedBooks =
-        Get.arguments ?? []; // Dikirim dari halaman sebelumnya
-    final DateTime returnDate = DateTime.now().add(const Duration(days: 7));
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+    final String? transactionId = args['transaction_id'];
+
+    if (transactionId == null) {
+      return const Scaffold(
+        body: Center(child: Text('ID Transaksi tidak ditemukan')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Detail Transaksi')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ...selectedBooks.map(
-                  (book) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.purple.shade50,
-                  ),
-                  child: ListTile(
-                    leading: Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.book),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: transactionController.loadTransactionData(transactionId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
+            return const Center(child: Text('Gagal memuat data transaksi.'));
+          }
+
+          final data = snapshot.data!;
+          final books = data['books'] as List<Map<String, dynamic>>;
+          final transaction = data['transaction'] as Map<String, dynamic>;
+          final Timestamp? estimateReturn = transaction['estimate_return_date'];
+          final String? currentStatus = transaction['status_transaction'];
+
+          return Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    ...books.map(
+                      (book) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          tileColor: Colors.purple.shade50,
+                          leading: const Icon(Icons.book),
+                          title: Text(book['title'] ?? 'Tanpa Judul'),
+                          subtitle: Text(book['author'] ?? 'Tanpa Penulis'),
+                        ),
+                      ),
                     ),
-                    title: Text(book['title'] ?? 'Tanpa Judul'),
-                    subtitle: Text(book['author'] ?? 'Tanpa Penulis'),
-                  ),
+                    const SizedBox(height: 24),
+                    if (estimateReturn != null)
+                      Center(
+                        child: Text(
+                          'Harus dikembalikan sebelum ${estimateReturn.toDate().day}/${estimateReturn.toDate().month}/${estimateReturn.toDate().year}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: Text(
-                'Harus dikembalikan sebelum ${returnDate.day}/${returnDate.month}/${returnDate.year}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MyButton(
+                      onPressed:
+                          () =>
+                              transactionController.userUpdateTransactionStatus(
+                                transactionId,
+                                'waiting for borrow',
+                              ),
+                      color: ColorConstant.greenColor,
+                      child: const Text(
+                        'Ajukan Peminjaman',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    MyButton(
+                      onPressed:
+                          () =>
+                              transactionController.userUpdateTransactionStatus(
+                                transactionId,
+                                'waiting for booking',
+                              ),
+                      color: ColorConstant.primaryColor,
+                      child: const Text(
+                        'Ajukan Booking',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: MyButton(
-          onPressed: () async {
-            await _submitTransaction(selectedBooks, returnDate);
-          },
-          color: ColorConstant.greenColor,
-          child: const Text(
-            'Ajukan Peminjaman',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
+            ],
+          );
+        },
       ),
     );
-  }
-
-  Future<void> _submitTransaction(
-      List<Map<String, dynamic>> books, DateTime returnDate) async {
-    try {
-      final firestore = FirebaseFirestore.instance;
-      final userData = await LocalStorage.getUserData();
-      final userId = userData['user_id'];
-
-      if (userId == null || userId.isEmpty) {
-        Get.snackbar('Error', 'User tidak ditemukan');
-        return;
-      }
-
-      final transactionRef = await firestore.collection('transactions').add({
-        'user_id': firestore.doc('users/$userId'),
-        'created_at': Timestamp.now(),
-        'return_date': Timestamp.fromDate(returnDate),
-        'status': 'pending',
-      });
-
-      for (var book in books) {
-        final bookId = book['id'];
-        if (bookId != null) {
-          await transactionRef.collection('transaction_details').add({
-            'book_id': firestore.doc('books/$bookId'),
-            'status': 'borrowed',
-          });
-        }
-      }
-
-      Get.snackbar('Sukses', 'Peminjaman diajukan');
-      Get.offAllNamed('/home'); // atau arahkan kembali ke halaman utama
-    } catch (e) {
-      print('Error submit transaction: $e');
-      Get.snackbar('Error', 'Gagal mengajukan peminjaman');
-    }
   }
 }

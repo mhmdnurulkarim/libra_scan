@@ -7,10 +7,11 @@ class TransactionController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   var transactionId = ''.obs;
+  var status_transaction = ''.obs;
+
   var memberData = {}.obs;
   var bookList = <Map<String, dynamic>>[].obs;
   var quantity = 1.obs;
-  var isBooking = false.obs;
 
   Future<void> submitTransaction({
     required String userId,
@@ -20,28 +21,31 @@ class TransactionController extends GetxController {
     try {
       final now = Timestamp.now();
       final userRef = _firestore.doc('user/$userId');
-      final bookRef = _firestore.doc('book/${book['id']}');
+      final bookRef = _firestore.doc('book/${book['book_id']}');
+      final estimateReturn = Timestamp.fromDate(
+        DateTime.now().add(const Duration(days: 7)),
+      );
 
-      // Cari transaksi aktif
-      final querySnapshot = await _firestore
-          .collection('transaction')
-          .where('user_id', isEqualTo: userRef)
-          .where('return_date', isNull: true)
-          .limit(1)
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('transaction')
+              .where('user_id', isEqualTo: userRef)
+              .where('return_date', isNull: true)
+              .where('status_transaction', isEqualTo: 'draft')
+              .limit(1)
+              .get();
 
       DocumentReference transactionRef;
 
       if (querySnapshot.docs.isNotEmpty) {
         final existingTransaction = querySnapshot.docs.first;
-        final existingIsBooking = existingTransaction['is_booking'] as bool;
+        final existingStatus =
+            existingTransaction['status_transaction'] ?? 'draft';
 
-        // Cek apakah jenis transaksi sama
-        if (existingIsBooking != isBooking.value) {
+        if (existingStatus != 'draft') {
           MySnackBar.show(
             title: 'Transaksi Aktif',
-            message:
-            'Anda memiliki transaksi aktif yang berbeda jenis. Selesaikan terlebih dahulu.',
+            message: 'Anda memiliki transaksi aktif yang sedang berjalan.',
             bgColor: Colors.orange,
             icon: Icons.warning,
           );
@@ -50,9 +54,8 @@ class TransactionController extends GetxController {
 
         transactionRef = querySnapshot.docs.first.reference;
 
-        // Ambil semua detail transaksi
-        final detailSnapshot = await transactionRef.collection('transaction_detail').get();
-
+        final detailSnapshot =
+            await transactionRef.collection('transaction_detail').get();
         int currentTotalQuantity = 0;
         DocumentSnapshot? existingDetail;
 
@@ -70,7 +73,7 @@ class TransactionController extends GetxController {
         if (currentTotalQuantity + quantity > 3) {
           MySnackBar.show(
             title: 'Maksimal Terlampaui',
-            message: 'Total buku tidak boleh lebih dari 3',
+            message: 'Total buku tidak boleh lebih dari 3.',
             bgColor: Colors.orange,
             icon: Icons.warning,
           );
@@ -78,54 +81,73 @@ class TransactionController extends GetxController {
         }
 
         if (existingDetail != null) {
-          // Jika buku sudah ada → update quantity
           final currentQty = (existingDetail.data() as Map<String, dynamic>)['quantity'] ?? 0;
           await existingDetail.reference.update({'quantity': currentQty + quantity});
         } else {
-          // Jika buku belum ada → tambahkan detail baru
-          await transactionRef.collection('transaction_detail').add({
-            'book_id': bookRef,
-            'transaction_id': transactionRef,
-            'quantity': quantity,
-            'status': 'pending',
-          });
+          await transactionRef
+              .collection('transaction_detail')
+              .add({
+                'book_id': bookRef,
+                'transaction_id': transactionRef,
+                'quantity': quantity,
+              });
         }
       } else {
-        // Buat transaksi baru
-        transactionRef = await _firestore.collection('transaction').add({
+        final transactionRef = await _firestore.collection('transaction').add({
           'user_id': userRef,
           'borrow_date': now,
-          'estimate_return_date': null,
+          'estimate_return_date': estimateReturn,
           'return_date': null,
           'status_penalty': false,
-          'is_booking': isBooking.value,
+          'status_transaction': 'draft',
         });
+        await transactionRef;
 
-        // Tambahkan detail pertama
-        await transactionRef.collection('transaction_detail').add({
-          'book_id': bookRef,
-          'transaction_id': transactionRef,
-          'quantity': quantity,
-          'status': 'pending',
-        });
+        final newDetailRef = await transactionRef
+            .collection('transaction_detail')
+            .add({
+              'book_id': bookRef,
+              'transaction_id': transactionRef,
+              'quantity': quantity,
+            });
+        await newDetailRef;
+
+        await transactionRef.update({'transaction_id': transactionRef.id});
+        await newDetailRef.update({'detail_id': newDetailRef.id});
       }
 
       MySnackBar.show(
         title: 'Sukses',
-        message: isBooking.value
-            ? 'Buku berhasil dibooking'
-            : 'Buku berhasil dipinjam',
-        bgColor: isBooking.value ? Colors.blue : Colors.green,
-        icon: isBooking.value ? Icons.info : Icons.check,
+        message:
+            'Permintaan peminjaman dikirim. Menunggu persetujuan pustakawan.',
+        bgColor: Colors.green,
+        icon: Icons.check,
       );
     } catch (e) {
       MySnackBar.show(
         title: 'Error',
-        message: 'Gagal ${isBooking.value ? 'booking' : 'meminjam'} buku: $e',
+        message: 'Gagal mengajukan peminjaman: $e',
         bgColor: Colors.red,
         icon: Icons.error,
       );
     }
+  }
+
+  Future<void> userUpdateTransactionStatus(String transactionId, String status) async {
+    final firestore = FirebaseFirestore.instance;
+    await firestore.collection('transaction').doc(transactionId).update({
+      'status_transaction': status,
+    });
+
+    Get.back();
+    Get.snackbar(
+      'Berhasil',
+      status == 'waiting for borrow'
+          ? 'Transaksi diajukan sebagai peminjaman.'
+          : 'Transaksi diajukan sebagai booking.',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
   }
 
   Future<void> returnBookWithPenaltyCheck(String id) async {
@@ -152,28 +174,16 @@ class TransactionController extends GetxController {
     }
   }
 
-  Future<void> loadTransactionData(String id) async {
+  Future<Map<String, dynamic>> loadTransactionData(String id) async {
     transactionId.value = id;
+    final Map<String, dynamic> result = {};
+
     try {
       final transactionDoc = await _firestore.collection('transaction').doc(id).get();
       final transactionData = transactionDoc.data();
+      if (transactionData == null) return {};
 
-      if (transactionData == null) return;
-
-      final userRef = transactionData['user_id'] as DocumentReference?;
-      if (userRef != null) {
-        final userSnapshot = await userRef.get();
-        if (userSnapshot.exists) {
-          memberData.value = {
-            'nin': userSnapshot['nin'],
-            'name': userSnapshot['name'],
-            'email': userSnapshot['email'],
-            'phone_number': userSnapshot['phone_number'],
-            'role': userSnapshot['role_id'],
-            'barcode': userSnapshot['barcode'] ?? '',
-          };
-        }
-      }
+      result['transaction'] = transactionData;
 
       final detailSnapshot = await _firestore
           .collection('transaction')
@@ -198,11 +208,14 @@ class TransactionController extends GetxController {
         });
       }
 
-      bookList.value = books;
+      result['books'] = books;
     } catch (e) {
       print('Error loading transaction data: $e');
     }
+
+    return result;
   }
+
 
   Future<void> approveTransaction() async {
     if (transactionId.value.isEmpty) return;
