@@ -188,15 +188,32 @@ class TransactionController extends GetxController {
       final userRef = transactionData['user_id'] as DocumentReference?;
       if (userRef != null && isAdmin) {
         final userSnapshot = await userRef.get();
-        if (userSnapshot.exists) {
-          memberData.value = {
-            'nin': userSnapshot['nin'],
-            'name': userSnapshot['name'],
-            'email': userSnapshot['email'],
-            'phone_number': userSnapshot['phone_number'],
-            'role': userSnapshot['role_id'],
-            'barcode': userSnapshot['barcode'] ?? '',
-          };
+        final userData = userSnapshot.data() as Map<String, dynamic>?;
+
+        if (userData != null) {
+          final accountSnapshot = await userRef.collection('account').limit(1).get();
+          if (accountSnapshot.docs.isNotEmpty) {
+            final accountData = accountSnapshot.docs.first.data();
+            final roleRef = accountData['role_id'] as DocumentReference?;
+
+            // Ambil ID role (misal "admin", "member", dll)
+            String roleId = '';
+            if (roleRef != null) {
+              roleId = roleRef.id;
+            }
+
+            final userFormatted = {
+              'nin': userData['nin'] ?? '',
+              'name': userData['name'] ?? '',
+              'email': accountData['email'] ?? '',
+              'phone_number': userData['phone_number'] ?? '',
+              'role_id': roleId,
+              'barcode': userData['barcode'] ?? '',
+            };
+
+            memberData.value = userFormatted;
+            result['user'] = userFormatted;
+          }
         }
       }
 
@@ -219,7 +236,6 @@ class TransactionController extends GetxController {
         books.add({
           'title': bookData['title'],
           'author': bookData['author'],
-          'status': data['status'],
         });
       }
 
