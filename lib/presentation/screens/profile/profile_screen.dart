@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:libra_scan/presentation/widgets/member_card.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../../data/share_preference.dart';
@@ -38,6 +39,7 @@ class ProfileScreen extends StatelessWidget {
         final String email = userData['email'] ?? '-';
         final String phoneNumber = userData['phone_number'] ?? '-';
         final String role = userData['role_id']?.toLowerCase() ?? 'anggota';
+        final barcode = userData['barcode'] ?? '';
 
         return Scaffold(
           body: SafeArea(
@@ -45,57 +47,14 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 // Kartu profil
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.pink.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.person, size: 48),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(nin),
-                            Text(
-                              name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(email),
-                            Text(phoneNumber),
-                            Text(role),
-                            const SizedBox(height: 12),
-                            Center(
-                              child: Column(
-                                children: [
-                                  const SizedBox(
-                                    height: 40,
-                                    child:
-                                        Placeholder(), // bisa ganti dengan barcode widget
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(userId),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                MemberCard(
+                  userId: userId,
+                  nin: nin,
+                  name: name,
+                  email: email,
+                  phoneNumber: phoneNumber,
+                  role: role,
+                  barcode: barcode,
                 ),
                 const SizedBox(height: 16),
 

@@ -63,7 +63,6 @@ class TransactionController extends GetxController {
           final data = doc.data() as Map<String, dynamic>;
           currentTotalQuantity += (data['quantity'] ?? 0) as int;
 
-          // Cek apakah buku sudah ada dalam detail
           final docBookRef = data['book_id'] as DocumentReference?;
           if (docBookRef?.id == bookRef.id) {
             existingDetail = doc;
@@ -81,16 +80,17 @@ class TransactionController extends GetxController {
         }
 
         if (existingDetail != null) {
-          final currentQty = (existingDetail.data() as Map<String, dynamic>)['quantity'] ?? 0;
-          await existingDetail.reference.update({'quantity': currentQty + quantity});
+          final currentQty =
+              (existingDetail.data() as Map<String, dynamic>)['quantity'] ?? 0;
+          await existingDetail.reference.update({
+            'quantity': currentQty + quantity,
+          });
         } else {
-          await transactionRef
-              .collection('transaction_detail')
-              .add({
-                'book_id': bookRef,
-                'transaction_id': transactionRef,
-                'quantity': quantity,
-              });
+          await transactionRef.collection('transaction_detail').add({
+            'book_id': bookRef,
+            'transaction_id': transactionRef,
+            'quantity': quantity,
+          });
         }
       } else {
         final transactionRef = await _firestore.collection('transaction').add({
@@ -133,53 +133,57 @@ class TransactionController extends GetxController {
     }
   }
 
-  Future<void> userUpdateTransactionStatus(String transactionId, String status) async {
-    final firestore = FirebaseFirestore.instance;
-    await firestore.collection('transaction').doc(transactionId).update({
+  Future<void> updateTransactionStatus(
+    String transactionId,
+    String status,
+  ) async {
+    await _firestore.collection('transaction').doc(transactionId).update({
       'status_transaction': status,
     });
 
+    String message = '';
+    switch (status) {
+      case 'waiting for borrow':
+        message = 'Diajukan untuk peminjaman buku.';
+        break;
+      case 'waiting for booking':
+        message = 'Diajukan untuk booking buku.';
+        break;
+      case 'take a book':
+        message = 'Diajukan untuk mengambil buku yang telah dibooking.';
+        break;
+      case 'waiting for return':
+        message = 'Diajukan untuk mengembalikan buku yang telah dipinjam.';
+        break;
+      case 'borrowed':
+        message = 'Disetujui untuk meminjam buku.';
+        break;
+      case 'booking':
+        message = 'Disetujui untuk dibooking.';
+        break;
+      default:
+        message = 'Status transaksi diperbarui.';
+    }
+
     Get.back();
-    Get.snackbar(
-      'Berhasil',
-      status == 'waiting for borrow'
-          ? 'Transaksi diajukan sebagai peminjaman.'
-          : 'Transaksi diajukan sebagai booking.',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
+    MySnackBar.show(
+      title: 'Berhasil',
+      message: message,
+      bgColor: Colors.green,
+      icon: Icons.check,
     );
   }
 
-  Future<void> returnBookWithPenaltyCheck(String id) async {
-    final doc = await _firestore.collection('transaction').doc(id).get();
-    final data = doc.data();
-    final now = Timestamp.now();
-
-    if (data != null && data['estimate_return_date'] != null) {
-      final estimate = data['estimate_return_date'] as Timestamp;
-      final late = now.toDate().isAfter(estimate.toDate());
-
-      await _firestore.collection('transaction').doc(id).update({
-        'return_date': now,
-        'status_penalty': late,
-      });
-
-      if (late) {
-        await _firestore
-            .collection('transaction')
-            .doc(id)
-            .collection('penalty')
-            .add({'transaction_id': doc.reference, 'period': now});
-      }
-    }
-  }
-
-  Future<Map<String, dynamic>> loadTransactionData(String id, {bool isAdmin = false}) async {
+  Future<Map<String, dynamic>> loadTransactionData(
+    String id, {
+    bool isAdmin = false,
+  }) async {
     transactionId.value = id;
     final Map<String, dynamic> result = {};
 
     try {
-      final transactionDoc = await _firestore.collection('transaction').doc(id).get();
+      final transactionDoc =
+          await _firestore.collection('transaction').doc(id).get();
       final transactionData = transactionDoc.data();
       if (transactionData == null) return {};
 
@@ -191,12 +195,12 @@ class TransactionController extends GetxController {
         final userData = userSnapshot.data() as Map<String, dynamic>?;
 
         if (userData != null) {
-          final accountSnapshot = await userRef.collection('account').limit(1).get();
+          final accountSnapshot =
+              await userRef.collection('account').limit(1).get();
           if (accountSnapshot.docs.isNotEmpty) {
             final accountData = accountSnapshot.docs.first.data();
             final roleRef = accountData['role_id'] as DocumentReference?;
 
-            // Ambil ID role (misal "admin", "member", dll)
             String roleId = '';
             if (roleRef != null) {
               roleId = roleRef.id;
@@ -217,11 +221,12 @@ class TransactionController extends GetxController {
         }
       }
 
-      final detailSnapshot = await _firestore
-          .collection('transaction')
-          .doc(id)
-          .collection('transaction_detail')
-          .get();
+      final detailSnapshot =
+          await _firestore
+              .collection('transaction')
+              .doc(id)
+              .collection('transaction_detail')
+              .get();
 
       final books = <Map<String, dynamic>>[];
       for (var detail in detailSnapshot.docs) {
@@ -233,10 +238,7 @@ class TransactionController extends GetxController {
         if (!bookSnapshot.exists) continue;
 
         final bookData = bookSnapshot.data() as Map<String, dynamic>;
-        books.add({
-          'title': bookData['title'],
-          'author': bookData['author'],
-        });
+        books.add({'title': bookData['title'], 'author': bookData['author']});
       }
 
       result['books'] = books;
@@ -247,45 +249,41 @@ class TransactionController extends GetxController {
     return result;
   }
 
-  Future<void> approveTransaction() async {
-    if (transactionId.value.isEmpty) return;
+  Future<void> returnWithPenaltyCheck(
+    String transactionId,
+    String status,
+  ) async {
+    await _firestore.collection('transaction').doc(transactionId).update({
+      'status_transaction': status,
+    });
 
-    final detailsRef = _firestore
-        .collection('transaction')
-        .doc(transactionId.value)
-        .collection('transaction_detail');
+    final doc =
+        await _firestore.collection('transaction').doc(transactionId).get();
+    final data = doc.data();
+    final now = Timestamp.now();
 
-    final snapshot = await detailsRef.get();
+    if (data != null && data['estimate_return_date'] != null) {
+      final estimate = data['estimate_return_date'] as Timestamp;
+      final late = now.toDate().isAfter(estimate.toDate());
 
-    for (var doc in snapshot.docs) {
-      await doc.reference.update({'status': 'borrowed'});
+      await _firestore.collection('transaction').doc(transactionId).update({
+        'status_penalty': late,
+      });
+
+      if (late) {
+        await _firestore
+            .collection('transaction')
+            .doc(transactionId)
+            .collection('penalty')
+            .add({'transaction_id': doc.reference, 'period': now});
+      }
+
+      MySnackBar.show(
+        title: 'Berhasil',
+        message: (status == 'returned') ? 'Diterima' : 'Ditolak',
+        bgColor: Colors.green,
+        icon: Icons.check,
+      );
     }
-
-    Get.snackbar('Berhasil', 'Transaksi telah disetujui');
-    await loadTransactionData(transactionId.value);
   }
-
-  Future<void> returnBooks() async {
-    if (transactionId.value.isEmpty) return;
-
-    final detailsRef = _firestore
-        .collection('transaction')
-        .doc(transactionId.value)
-        .collection('transaction_detail');
-
-    final snapshot = await detailsRef.get();
-
-    for (var doc in snapshot.docs) {
-      await doc.reference.update({'status': 'returned'});
-    }
-
-    Get.snackbar('Berhasil', 'Buku berhasil dikembalikan');
-    await loadTransactionData(transactionId.value);
-  }
-
-  bool get allReturned =>
-      bookList.every((book) => book['status'] == 'returned');
-
-  bool get allBorrowed =>
-      bookList.every((book) => book['status'] == 'borrowed');
 }

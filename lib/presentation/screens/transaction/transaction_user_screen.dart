@@ -29,7 +29,7 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Transaksi')),
+      appBar: AppBar(title: const Text('Detail Transaksi'), centerTitle: true),
       body: FutureBuilder<Map<String, dynamic>>(
         future: transactionController.loadTransactionData(transactionId),
         builder: (context, snapshot) {
@@ -56,7 +56,7 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                   padding: const EdgeInsets.all(16),
                   children: [
                     ...books.map(
-                          (book) => Padding(
+                      (book) => Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
                           vertical: 8.0,
@@ -85,53 +85,67 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                 ),
               ),
 
-              currentStatus != 'borrowed'
-                  ? Padding(
+              Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    MyButton(
-                      onPressed: () => transactionController
-                          .userUpdateTransactionStatus(
-                        transactionId,
-                        'waiting for borrow',
+                    if (currentStatus != 'borrowed') ...[
+                      MyButton(
+                        onPressed:
+                            () => transactionController.updateTransactionStatus(
+                              transactionId,
+                              'waiting for borrow',
+                            ),
+                        color: ColorConstant.greenColor,
+                        child: const Text(
+                          'Ajukan Peminjaman',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                      color: ColorConstant.greenColor,
-                      child: const Text(
-                        'Ajukan Peminjaman',
-                        style: TextStyle(color: Colors.white),
+                      const SizedBox(height: 12),
+                      MyButton(
+                        onPressed:
+                            () => transactionController.updateTransactionStatus(
+                              transactionId,
+                              'waiting for booking',
+                            ),
+                        color: ColorConstant.primaryColor,
+                        child: const Text(
+                          'Ajukan Booking',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    MyButton(
-                      onPressed: () => transactionController
-                          .userUpdateTransactionStatus(
-                        transactionId,
-                        'waiting for booking',
+                      const SizedBox(height: 12),
+                    ] else if (currentStatus == 'booking') ...[
+                      MyButton(
+                        onPressed:
+                            () => transactionController.updateTransactionStatus(
+                              transactionId,
+                              'take a book',
+                            ),
+                        color: ColorConstant.primaryColor,
+                        child: const Text(
+                          'Ajukan Pengambilan Buku (Booking)',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                      color: ColorConstant.primaryColor,
-                      child: const Text(
-                        'Ajukan Booking',
-                        style: TextStyle(color: Colors.white),
+                      const SizedBox(height: 12),
+                    ] else if (currentStatus == 'borrowed') ...[
+                      MyButton(
+                        onPressed:
+                            () => transactionController.updateTransactionStatus(
+                              transactionId,
+                              'waiting for return',
+                            ),
+                        color: ColorConstant.greenColor,
+                        child: const Text(
+                          'Ajukan Pengembalian',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ),
+                    ],
                   ],
-                ),
-              )
-                  : Padding(
-                padding: const EdgeInsets.all(16),
-                child: MyButton(
-                  onPressed: () => transactionController
-                      .userUpdateTransactionStatus(
-                    transactionId,
-                    'waiting for return',
-                  ),
-                  color: ColorConstant.greenColor,
-                  child: const Text(
-                    'Ajukan Pengembalian',
-                    style: TextStyle(color: Colors.white),
-                  ),
                 ),
               ),
             ],

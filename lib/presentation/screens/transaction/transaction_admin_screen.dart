@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/controllers/transaction_controller.dart';
+import 'package:libra_scan/presentation/widgets/member_card.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../widgets/book_card.dart';
@@ -29,7 +30,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Transaksi')),
+      appBar: AppBar(title: const Text('Detail Transaksi'), centerTitle: true),
       body: FutureBuilder<Map<String, dynamic>>(
         future: transactionController.loadTransactionData(
           transactionId,
@@ -51,152 +52,101 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
               (data['books'] as List?)?.cast<Map<String, dynamic>>() ?? [];
           final transaction =
               (data['transaction'] as Map<String, dynamic>?) ?? {};
-          final member = (data['user'] as Map<String, dynamic>?) ?? {};
           final estimateReturn =
               transaction['estimate_return_date'] as Timestamp?;
-          final status = transaction['status_transaction'] as String?;
-          final barcode = member['barcode'] ?? '';
+          final currentStatus = transaction['status_transaction'] as String?;
+
+          final userData = (data['user'] as Map<String, dynamic>?) ?? {};
+          final String userId = userData['user_id'] ?? '-';
+          final String nin = userData['nin'] ?? '-';
+          final String name = userData['name'] ?? '-';
+          final String email = userData['email'] ?? '-';
+          final String phoneNumber = userData['phone_number'] ?? '-';
+          final String role = userData['role_id']?.toLowerCase() ?? 'anggota';
+          final barcode = userData['barcode'] ?? '';
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Anggota + Barcode
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.purple[50],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
+                MemberCard(
+                  userId: userId,
+                  nin: nin,
+                  name: name,
+                  email: email,
+                  phoneNumber: phoneNumber,
+                  role: role,
+                  barcode: barcode,
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView(
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.person, size: 40),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  member['nin'] ?? '',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(member['name'] ?? ''),
-                                Text(member['email'] ?? ''),
-                                Text(member['phone_number'] ?? ''),
-                                Text(member['role_id'] ?? ''),
-                              ],
+                      ...books.map(
+                        (book) => BookCard(
+                          title: book['title'],
+                          author: book['author'],
+                          onTap: () {
+                            Get.toNamed('/book-detail', arguments: book);
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      if (estimateReturn != null)
+                        Center(
+                          child: Text(
+                            'Denda masih ${estimateReturn.toDate().difference(DateTime.now()).inDays} Hari lagi\nHingga tanggal ${estimateReturn.toDate().day}/${(estimateReturn.toDate().month)}/${estimateReturn.toDate().year}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        height: 60,
-                        color: Colors.white,
-                        child: const Center(child: Text('Barcode Image')),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(barcode, style: const TextStyle(fontSize: 14)),
+                        ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 16),
-
-                // Daftar Buku
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: books.length,
-                    itemBuilder: (context, index) {
-                      final book = books[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Get.toNamed('/book-detail', arguments: book);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.purple[50],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.book),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      book['title'] ?? '',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(book['author'] ?? ''),
-                                  ],
-                                ),
-                              ),
-                              const Icon(Icons.arrow_forward_ios, size: 16),
-                            ],
-                          ),
+                if (currentStatus == 'waiting for borrow' ||
+                    currentStatus == 'take a book') ...[
+                  MyButton(
+                    onPressed:
+                        () => transactionController.updateTransactionStatus(
+                          transactionId,
+                          'borrowed',
                         ),
-                      );
-                    },
-                  ),
-                ),
-
-                // Estimasi Pengembalian / Denda
-                if (estimateReturn != null)
-                  Column(
-                    children: [
-                      const SizedBox(height: 8),
-                      Text(
-                        'Denda masih ${estimateReturn.toDate().difference(DateTime.now()).inDays} Hari lagi\nHingga tanggal ${estimateReturn.toDate().day}/${(estimateReturn.toDate().month)}/${estimateReturn.toDate().year}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-
-                // Tombol Aksi
-                SizedBox(
-                  width: double.infinity,
-                  child: MyButton(
-                    onPressed: () {
-                      if (status == 'waiting for approval') {
-                        transactionController.approveTransaction();
-                      } else if (status == 'borrowed') {
-                        transactionController.returnBooks();
-                      }
-                    },
                     color: ColorConstant.greenColor,
                     child: const Text(
-                      'Pinjam/Tolak/Kembali',
+                      'Setuju Untuk Peminjaman Buku',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                ),
+                ] else if (currentStatus == 'waiting for booking') ...[
+                  MyButton(
+                    onPressed:
+                        () => transactionController.updateTransactionStatus(
+                          transactionId,
+                          'booking',
+                        ),
+                    color: ColorConstant.primaryColor,
+                    child: const Text(
+                      'Setuju Untuk Booking Buku',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ] else if (currentStatus == 'borrowed') ...[
+                  MyButton(
+                    onPressed:
+                        () => transactionController.returnWithPenaltyCheck(
+                          transactionId,
+                          'returned',
+                        ),
+                    color: ColorConstant.greenColor,
+                    child: const Text(
+                      'Menerima Pengembalian Buku',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
               ],
             ),
           );
