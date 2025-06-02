@@ -111,4 +111,26 @@ class BookController extends GetxController {
       );
     }
   }
+
+  Future<Map<String, dynamic>?> getBook(String barcode) async {
+    try {
+      final snapshot = await _firestore
+          .collection('book')
+          .where('barcode', isEqualTo: barcode)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final doc = snapshot.docs.first;
+        final data = doc.data();
+        data['book_id'] = doc.id;
+        return data;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error getBook: $e');
+      return null;
+    }
+  }
 }
