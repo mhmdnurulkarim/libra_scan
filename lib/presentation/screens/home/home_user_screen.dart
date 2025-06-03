@@ -1,20 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../../common/constants/color_constans.dart';
 import '../../controllers/home_user_controller.dart';
 import '../../widgets/request_book_card.dart';
 
-class HomeUserScreen extends StatefulWidget {
-  const HomeUserScreen({super.key});
+class HomeUserScreen extends StatelessWidget {
+  HomeUserScreen({super.key});
 
-  @override
-  State<HomeUserScreen> createState() => _HomeUserScreenState();
-}
-
-class _HomeUserScreenState extends State<HomeUserScreen> {
   final controller = Get.put(HomeUserController());
+
+  String getStatusTitle(String status) {
+    switch (status) {
+      case 'borrowed':
+        return 'Buku sedang dipinjam:';
+      case 'waiting for borrow':
+        return 'Ingin pinjam buku:';
+      case 'waiting for booking':
+        return 'Ingin booking buku:';
+      case 'booking':
+        return 'Buku sedang dibooking:';
+      case 'take a book':
+        return 'Ingin ambil booking buku:';
+      case 'waiting for return':
+        return 'Ingin mengembalikan buku:';
+      default:
+        return 'Daftar Keranjang Buku:';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,55 +50,72 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Yang sedang dipinjam/booking:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
+
             Obx(() {
               final transactions = controller.currentTransactions;
+              if (transactions.isEmpty) return const SizedBox();
 
-              if (transactions.isEmpty) {
-                return const Text("Belum ada transaksi aktif.");
-              }
+              final status = transactions.first['status'];
+              final title = getStatusTitle(status);
 
               return Column(
-                children:
-                    transactions.map((tx) {
-                      return RequestBookCard(
-                        name: tx['name'] ?? 'User',
-                        date: tx['created_at'] as Timestamp?,
-                        books: tx['book_count'] ?? 0,
-                        onTap:
-                            () => controller.goToDetail(tx['transaction_id']),
-                      );
-                    }).toList(),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...transactions.map(
+                    (data) => RequestBookCard(
+                      name: data['name'] ?? 'User',
+                      date: data['created_at'],
+                      books: data['book_count'] ?? 0,
+                      onTap:
+                          () => Get.toNamed(
+                            '/transaction-user',
+                            arguments: {
+                              'transaction_id': data['transaction_id'],
+                            },
+                          ),
+                    ),
+                  ),
+                ],
               );
             }),
-            const SizedBox(height: 24),
-            const Text(
-              'Peminjaman sebelumnya:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+
             const SizedBox(height: 12),
+
             Obx(() {
               final past = controller.pastLoans;
-
-              if (past.isEmpty) {
-                return const Text("Belum ada riwayat peminjaman.");
-              }
+              if (past.isEmpty) return const SizedBox();
 
               return Column(
-                children:
-                    past.map((tx) {
-                      return RequestBookCard(
-                        name: tx['name'] ?? 'User',
-                        date: tx['created_at'] as Timestamp?,
-                        books: tx['book_count'] ?? 0,
-                        onTap:
-                            () => controller.goToDetail(tx['transaction_id']),
-                      );
-                    }).toList(),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Peminjaman sebelumnya:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  ...past.map(
+                    (data) => RequestBookCard(
+                      name: data['name'] ?? 'User',
+                      date: data['created_at'],
+                      books: data['book_count'] ?? 0,
+                      onTap:
+                          () => Get.toNamed(
+                            '/transaction-user',
+                            arguments: {
+                              'transaction_id': data['transaction_id'],
+                            },
+                          ),
+                    ),
+                  ),
+                ],
               );
             }),
           ],

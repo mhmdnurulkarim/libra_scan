@@ -133,7 +133,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                ] else if (currentStatus == 'borrowed') ...[
+                ] else if (currentStatus == 'waiting for return') ...[
                   MyButton(
                     onPressed:
                         () => transactionController.returnWithPenaltyCheck(

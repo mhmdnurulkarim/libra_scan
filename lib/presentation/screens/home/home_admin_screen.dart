@@ -10,6 +10,21 @@ class HomeAdminScreen extends StatelessWidget {
 
   final HomeAdminController controller = Get.put(HomeAdminController());
 
+  String getTitleFromStatus(String status) {
+    switch (status) {
+      case 'waiting for borrow':
+        return 'Permintaan peminjaman buku:';
+      case 'take a book':
+        return 'Permintaan pengambilan buku:';
+      case 'waiting for booking':
+        return 'Permintaan booking buku:';
+      case 'waiting for return':
+        return 'Permintaan pengembalian buku:';
+      default:
+        return 'Permintaan lainnya:';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,64 +48,54 @@ class HomeAdminScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            const Text(
-              'Permintaan peminjaman buku:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
             Obx(() {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (controller.borrowRequests.isEmpty) {
-                return const Text('Tidak ada permintaan peminjaman buku.');
-              } else {
-                return Column(
-                  children:
-                      controller.borrowRequests
-                          .map(
-                            (member) => RequestBookCard(
-                              name: member['name'] ?? '',
-                              email: member['email'] ?? '',
-                              books: member['book'] ?? 0,
+              }
+
+              final grouped = controller.groupedRequests;
+              if (grouped.isEmpty) {
+                return const Text('Tidak ada permintaan transaksi.');
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children:
+                    grouped.entries.map((entry) {
+                      final status = entry.key;
+                      final requests = entry.value;
+                      final title = getTitleFromStatus(status);
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ...requests.map(
+                            (data) => RequestBookCard(
+                              name: data['name'] ?? '',
+                              email: data['email'] ?? '',
+                              books: data['book'] ?? 0,
                               onTap:
-                                  () => controller.goToDetail(
-                                    member['transaction_id'],
+                                  () => Get.toNamed(
+                                    '/transaction-admin',
+                                    arguments: {
+                                      'transaction_id': data['transaction_id'],
+                                    },
                                   ),
                             ),
-                          )
-                          .toList(),
-                );
-              }
-            }),
-            const SizedBox(height: 24),
-            const Text(
-              'Permintaan booking buku:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (controller.bookingRequests.isEmpty) {
-                return const Text('Tidak ada permintaan booking buku.');
-              } else {
-                return Column(
-                  children:
-                      controller.bookingRequests
-                          .map(
-                            (member) => RequestBookCard(
-                              name: member['name'] ?? '',
-                              email: member['email'] ?? '',
-                              books: member['book'] ?? 0,
-                              onTap:
-                                  () => controller.goToDetail(
-                                    member['transaction_id'],
-                                  ),
-                            ),
-                          )
-                          .toList(),
-                );
-              }
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      );
+                    }).toList(),
+              );
             }),
           ],
         ),

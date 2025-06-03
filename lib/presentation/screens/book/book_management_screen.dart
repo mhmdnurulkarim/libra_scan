@@ -40,7 +40,7 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
     if (args != null && args is Map<String, dynamic>) {
       if (args.containsKey('book')) {
         bookData = args['book'];
-        bookDocId = bookData?['id'];
+        bookDocId = bookData?['book_id'];
       }
       if (args['from'] == 'search') {
         isFromSearch = true;
@@ -58,29 +58,28 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
   }
 
   void _loadCategories() async {
+    final selectedRef = (bookData != null && bookData!['category_id'] is DocumentReference)
+        ? bookData!['category_id'] as DocumentReference
+        : null;
+
     final snapshot = await controller.getAllCategories();
-    setState(() {
-      categories = snapshot.docs;
+    final docs = snapshot.docs;
 
-      if (bookData != null && bookData!['category_id'] is DocumentReference) {
-        final currentRef = bookData!['category_id'] as DocumentReference;
-        selectedCategory = categories.firstWhere(
-              (cat) => cat.reference.path == currentRef.path,
-          orElse: () => categories.first,
-        );
+    DocumentSnapshot? selected;
+
+    if (selectedRef != null) {
+      for (var cat in docs) {
+        if (cat.reference.path == selectedRef.path) {
+          selected = cat;
+          break;
+        }
       }
-    });
-  }
+    }
 
-  @override
-  void dispose() {
-    titleController.dispose();
-    isbnController.dispose();
-    authorController.dispose();
-    barcodeController.dispose();
-    stockController.dispose();
-    synopsisController.dispose();
-    super.dispose();
+    setState(() {
+      categories = docs;
+      selectedCategory = selected ?? (docs.isNotEmpty ? docs.first : null);
+    });
   }
 
   void _submitBook() async {
@@ -109,29 +108,16 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
       'synopsis': synopsisController.text,
     };
 
-    if (bookDocId != null) {
-      await controller.updateBook(bookDocId!, book);
-    } else {
-      controller.addBook(book);
-    }
-
-    Get.back(result: true);
+    controller.submitBook(
+      bookDocId: bookDocId,
+      book: book,
+      isEdit: bookDocId != null,
+    );
   }
 
-  void _deleteBook() async {
-    final confirm = await Get.defaultDialog<bool>(
-      title: "Konfirmasi",
-      middleText: "Yakin ingin menghapus buku ini?",
-      textCancel: "Batal",
-      textConfirm: "Hapus",
-      confirmTextColor: Colors.white,
-      onConfirm: () => Get.back(result: true),
-      onCancel: () => Get.back(result: false),
-    );
-
-    if (confirm == true && bookDocId != null) {
-      await controller.deleteBook(bookDocId!);
-      Get.back();
+  void _deleteBook() {
+    if (bookDocId != null) {
+      controller.deleteBook(bookDocId!);
     }
   }
 
@@ -169,11 +155,13 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<DocumentSnapshot>(
-                  value: selectedCategory,
+                  value: categories.any((cat) => cat.reference.path == selectedCategory?.reference.path)
+                      ? categories.firstWhere((cat) => cat.reference.path == selectedCategory?.reference.path)
+                      : null,
                   items: categories.map((category) {
                     final id = category.id;
                     final genre = category['genre'];
-                    return DropdownMenuItem(
+                    return DropdownMenuItem<DocumentSnapshot>(
                       value: category,
                       child: Text('$id - $genre'),
                     );
@@ -187,8 +175,9 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                     labelText: 'Kategori *',
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
                     ),
                   ),
                 ),
@@ -272,5 +261,16 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    isbnController.dispose();
+    authorController.dispose();
+    barcodeController.dispose();
+    stockController.dispose();
+    synopsisController.dispose();
+    super.dispose();
   }
 }

@@ -236,7 +236,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     );
                   },
                   color: ColorConstant.greenColor,
-                  child: const Text('Ingin Pinjam', style: TextStyle(color: Colors.white)),
+                  child: const Text('Masukkan ke Keranjang', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

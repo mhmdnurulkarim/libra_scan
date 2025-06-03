@@ -7,7 +7,7 @@ class HomeUserController extends GetxController {
   var currentTransactions = <Map<String, dynamic>>[].obs;
   var pastLoans = <Map<String, dynamic>>[].obs;
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   @override
   void onInit() {
@@ -18,41 +18,36 @@ class HomeUserController extends GetxController {
   Future<void> fetchUserTransactions() async {
     try {
       final userData = await LocalStorage.getUserData();
-      final userId = userData['user_id'];
-      final userName = userData['name'];
+      final userRef = _firestore.doc('user/${userData['user_id']}');
+      final name = userData['name'];
 
-      final transactionsSnapshot = await _firestore
+      final snapshot = await _firestore
           .collection('transaction')
-          .where('user_id', isEqualTo: _firestore.doc('user/$userId'))
+          .where('user_id', isEqualTo: userRef)
           .get();
 
-      List<Map<String, dynamic>> current = [];
-      List<Map<String, dynamic>> past = [];
+      final List<Map<String, dynamic>> current = [];
+      final List<Map<String, dynamic>> past = [];
 
-      for (var transaction in transactionsSnapshot.docs) {
-        final transactionData = transaction.data();
-        final createdAt = transactionData['borrow_date'] as Timestamp?;
-        final transactionId = transaction.id;
-        final statusTransaction = transactionData['status_transaction'] as String? ?? 'draft';
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final status = data['status_transaction'] ?? 'draft';
 
-        final detailsSnapshot = await transaction.reference.collection('transaction_detail').get();
-
-        int totalQty = 0;
-        for (var detail in detailsSnapshot.docs) {
-          final data = detail.data();
-          final qty = (data['quantity'] is num) ? (data['quantity'] as num).toInt() : 1;
-          totalQty += qty;
-        }
+        final details = await doc.reference.collection('transaction_detail').get();
+        final totalQty = details.docs.fold<int>(0, (sum, d) {
+          final qty = d['quantity'];
+          return sum + (qty is int ? qty : 1);
+        });
 
         final item = {
-          'transaction_id': transactionId,
-          'created_at': createdAt,
+          'transaction_id': doc.id,
+          'created_at': data['borrow_date'],
           'book_count': totalQty,
-          'name': userName,
-          'status': statusTransaction,
+          'name': name,
+          'status': status,
         };
 
-        if (statusTransaction == 'returned') {
+        if (status == 'returned') {
           past.add(item);
         } else {
           current.add(item);

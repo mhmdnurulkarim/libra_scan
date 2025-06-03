@@ -90,7 +90,7 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (currentStatus != 'borrowed') ...[
+                    if (currentStatus == 'waiting for borrow' || currentStatus == 'waiting for booking') ...[
                       MyButton(
                         onPressed:
                             () => transactionController.updateTransactionStatus(
@@ -144,6 +144,8 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
+                    ] else ...[
+                      const SizedBox(),
                     ],
                   ],
                 ),

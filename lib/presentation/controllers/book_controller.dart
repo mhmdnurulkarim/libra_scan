@@ -51,10 +51,37 @@ class BookController extends GetxController {
     return _firestore.collection('category').get();
   }
 
-  void addBook(Map<String, dynamic> book) async {
+  Future<void> submitBook({
+    required String? bookDocId,
+    required Map<String, dynamic> book,
+    required bool isEdit,
+  }) async {
+    try {
+      if (isEdit && bookDocId != null) {
+        await updateBook(bookDocId, book);
+      } else {
+        await addBook(book);
+        MySnackBar.show(
+          title: 'Sukses',
+          message: 'Buku berhasil ditambahkan',
+          bgColor: Colors.green,
+          icon: Icons.check,
+        );
+      }
+      Get.back(result: true);
+    } catch (e) {
+      MySnackBar.show(
+        title: 'Error',
+        message: 'Gagal menyimpan buku: $e',
+        bgColor: Colors.red,
+        icon: Icons.error,
+      );
+    }
+  }
+
+  Future<void> addBook(Map<String, dynamic> book) async {
     try {
       final docRef = await _firestore.collection('book').add(book);
-
       await docRef.update({'book_id': docRef.id});
 
       MySnackBar.show(
@@ -75,7 +102,6 @@ class BookController extends GetxController {
     }
   }
 
-
   Future<void> updateBook(String id, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('book').doc(id).update(data);
@@ -95,13 +121,27 @@ class BookController extends GetxController {
   }
 
   Future<void> deleteBook(String id) async {
+    final confirm = await Get.defaultDialog<bool>(
+      title: "Konfirmasi",
+      middleText: "Yakin ingin menghapus buku ini?",
+      textCancel: "Batal",
+      textConfirm: "Hapus",
+      confirmTextColor: Colors.white,
+      onConfirm: () => Get.back(result: true),
+      onCancel: () => Get.back(result: false),
+    );
+
     try {
-      await _firestore.collection('book').doc(id).delete();
-      MySnackBar.show(
-        title: 'Berhasil',
-        message: 'Buku berhasil dihapus',
-        bgColor: Colors.green,
-      );
+      if (confirm == true) {
+        await _firestore.collection('book').doc(id).delete();
+        MySnackBar.show(
+          title: 'Berhasil',
+          message: 'Buku berhasil dihapus',
+          bgColor: Colors.green,
+        );
+
+        Get.back(result: true);
+      }
     } catch (e) {
       MySnackBar.show(
         title: 'Error',
