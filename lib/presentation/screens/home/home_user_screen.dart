@@ -38,7 +38,7 @@ class HomeUserScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Get.toNamed('/scanner'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstant.greenColor,
+                backgroundColor: ColorConstant.primaryColor(context),
                 minimumSize: const Size(double.infinity, 120),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -46,14 +46,22 @@ class HomeUserScreen extends StatelessWidget {
               ),
               child: Text(
                 'Scan Barcode',
-                style: TextStyle(fontSize: 18, color: ColorConstant.whiteColor),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
             const SizedBox(height: 24),
 
             Obx(() {
               final transactions = controller.currentTransactions;
-              if (transactions.isEmpty) return const SizedBox();
+              if (transactions.isEmpty) {
+                return Text(
+                  'Keranjang buku kamu kosong.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ColorConstant.fontColor(context),
+                  ),
+                );
+              }
 
               final status = transactions.first['status'];
               final title = getStatusTitle(status);

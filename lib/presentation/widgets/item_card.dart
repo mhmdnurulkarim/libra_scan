@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import '../../common/constants/color_constans.dart';
 
-class BookCard extends StatelessWidget {
+class ItemCard extends StatelessWidget {
   final String title;
-  final String author;
   final VoidCallback onTap;
 
-  const BookCard({
+  const ItemCard({
     super.key,
     required this.title,
-    required this.author,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final backgroundColor = ColorConstant.primaryColor(context);
-    final fontColor = Colors.white;
+    final fontColor = ColorConstant.backgroundColor(context);
     final borderColor = ColorConstant.secondaryColor(context);
 
     return Container(
@@ -26,16 +24,6 @@ class BookCard extends StatelessWidget {
         border: Border.all(color: borderColor),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: ColorConstant.secondaryColor(context),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(Icons.image, color: fontColor),
-        ),
         title: Text(
           title,
           style: TextStyle(
@@ -43,14 +31,7 @@ class BookCard extends StatelessWidget {
             color: fontColor,
           ),
         ),
-        subtitle: Text(
-          author,
-          style: TextStyle(
-            fontSize: 12,
-            color: fontColor,
-          ),
-        ),
-        trailing: Icon(Icons.arrow_forward_ios, color: fontColor),
+        trailing: Icon(Icons.arrow_forward_ios, color: fontColor.withOpacity(0.8)),
         onTap: onTap,
       ),
     );

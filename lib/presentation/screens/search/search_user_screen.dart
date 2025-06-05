@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/book_card.dart';
 
+import '../../../common/constants/color_constans.dart';
 import '../../controllers/book_controller.dart';
 
 class SearchUserScreen extends StatefulWidget {
@@ -33,21 +34,35 @@ class _SearchScreenState extends State<SearchUserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cari Buku')),
+      appBar: AppBar(
+        title: const Text("Cari Buku"),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
+              cursorColor: ColorConstant.primaryColor(context),
               decoration: InputDecoration(
                 hintText: 'Mencari Buku Apa?',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: const Color(0xFFF3EFFF),
+                fillColor: ColorConstant.backgroundColor(context),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: ColorConstant.primaryColor(context),
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
@@ -57,7 +72,15 @@ class _SearchScreenState extends State<SearchUserScreen> {
               final books = controller.filteredBooks;
 
               if (books.isEmpty) {
-                return const Center(child: Text('Tidak ada buku ditemukan.'));
+                return Center(
+                  child: Text(
+                    'Tidak ada buku ditemukan.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ColorConstant.fontColor(context),
+                    ),
+                  ),
+                );
               }
 
               return ListView.builder(

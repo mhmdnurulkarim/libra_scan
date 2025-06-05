@@ -35,7 +35,7 @@ class HomeAdminScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Get.toNamed('/scanner'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstant.greenColor,
+                backgroundColor: ColorConstant.primaryColor(context),
                 minimumSize: const Size(double.infinity, 120),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -43,19 +43,31 @@ class HomeAdminScreen extends StatelessWidget {
               ),
               child: Text(
                 'Scan Barcode',
-                style: TextStyle(fontSize: 18, color: ColorConstant.whiteColor),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
             const SizedBox(height: 24),
 
             Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: ColorConstant.primaryColor(context),
+                  ),
+                );
               }
 
               final grouped = controller.groupedRequests;
               if (grouped.isEmpty) {
-                return const Text('Tidak ada permintaan transaksi.');
+                return Center(
+                  child: Text(
+                    'Tidak ada permintaan transaksi.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ColorConstant.fontColor(context),
+                    ),
+                  ),
+                );
               }
 
               return Column(
@@ -71,9 +83,10 @@ class HomeAdminScreen extends StatelessWidget {
                         children: [
                           Text(
                             title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: ColorConstant.fontColor(context),
                             ),
                           ),
                           const SizedBox(height: 12),

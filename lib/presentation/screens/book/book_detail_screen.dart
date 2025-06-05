@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:libra_scan/common/constants/color_constans.dart';
-import 'package:libra_scan/presentation/controllers/transaction_controller.dart';
-import 'package:libra_scan/presentation/widgets/button.dart';
 
+import '../../../common/constants/color_constans.dart';
 import '../../../data/share_preference.dart';
 import '../../controllers/book_controller.dart';
 import '../../controllers/main_controller.dart';
+import '../../controllers/transaction_controller.dart';
+import '../../widgets/button.dart';
 
 class BookDetailScreen extends StatefulWidget {
   const BookDetailScreen({super.key});
@@ -61,14 +61,21 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     final data = Get.arguments as Map<String, dynamic>?;
 
     if (isCheckingData) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Center(
+        child: CircularProgressIndicator(
+          color: ColorConstant.primaryColor(context),
+        ),
       );
     }
 
     if (data == null) {
-      return const Scaffold(
-        body: Center(child: Text('Data buku tidak tersedia')),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'Data buku tidak tersedia',
+            style: TextStyle(color: ColorConstant.fontColor(context)),
+          ),
+        ),
       );
     }
 
@@ -80,7 +87,11 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     final String sinopsis = data['synopsis'] ?? 'Sinopsis tidak tersedia.';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Buku')),
+      appBar: AppBar(
+        title: const Text('Detail Buku'),
+        centerTitle: true,
+      ),
+      backgroundColor: ColorConstant.backgroundColor(context),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -92,8 +103,15 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 Container(
                   width: 80,
                   height: 100,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image, size: 40),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[700]
+                          : Colors.grey[300],
+                  child: Icon(
+                    Icons.image,
+                    size: 40,
+                    color: ColorConstant.fontColor(context),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -102,47 +120,94 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: ColorConstant.fontColor(context),
+                        ),
                       ),
                       const SizedBox(height: 4),
-                      Text('ISBN $isbn', style: const TextStyle(color: Colors.black54)),
+                      Text(
+                        'ISBN $isbn',
+                        style: TextStyle(
+                          color: ColorConstant.fontColor(
+                            context,
+                          ).withOpacity(0.6),
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text(author, style: const TextStyle(color: Colors.black87)),
+                      Text(
+                        author,
+                        style: TextStyle(
+                          color: ColorConstant.fontColor(context),
+                        ),
+                      ),
                       const SizedBox(height: 4),
                       FutureBuilder<DocumentSnapshot>(
                         future: categoriseRef?.get(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Text('Memuat kategori...');
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text(
+                              'Memuat kategori...',
+                              style: TextStyle(
+                                color: ColorConstant.fontColor(context),
+                              ),
+                            );
                           }
-                          if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-                            return const Text('Kategori tidak ditemukan');
+                          if (snapshot.hasError ||
+                              !snapshot.hasData ||
+                              !snapshot.data!.exists) {
+                            return Text(
+                              'Kategori tidak ditemukan',
+                              style: TextStyle(
+                                color: ColorConstant.fontColor(context),
+                              ),
+                            );
                           }
 
-                          final kategoriData = snapshot.data!.data() as Map<String, dynamic>?;
+                          final kategoriData =
+                              snapshot.data!.data() as Map<String, dynamic>?;
                           final categoryId = snapshot.data!.id;
 
                           return Text(
                             '$categoryId - ${kategoriData?['genre'] ?? 'Tidak Diketahui'}',
-                            style: const TextStyle(color: Colors.black87),
+                            style: TextStyle(
+                              color: ColorConstant.fontColor(context),
+                            ),
                           );
                         },
                       ),
                       const SizedBox(height: 4),
-                      Text('$stock Stok Tersedia', style: const TextStyle(color: Colors.black87)),
+                      Text(
+                        '$stock Stok Tersedia',
+                        style: TextStyle(
+                          color: ColorConstant.fontColor(context),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            const Text('Sinopsis:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              'Sinopsis:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: ColorConstant.fontColor(context),
+              ),
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
                   sinopsis,
-                  style: const TextStyle(fontSize: 14),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorConstant.fontColor(context),
+                  ),
                 ),
               ),
             ),
@@ -164,15 +229,16 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             padding: const EdgeInsets.all(16),
             child: MyButton(
               onPressed: () async {
-                final result = await Get.toNamed('/book-management', arguments: {
-                  'book': data,
-                  'from': 'detail',
-                });
+                final result = await Get.toNamed(
+                  '/book-management',
+                  arguments: {'book': data, 'from': 'detail'},
+                );
                 if (result == true) {
                   bookController.fetchBooks();
                 }
               },
-              color: Colors.green,
+              backgroundColor: ColorConstant.primaryColor(context),
+              foregroundColor: ColorConstant.backgroundColor(context),
               child: const Text('Edit', style: TextStyle(color: Colors.white)),
             ),
           );
@@ -194,7 +260,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           });
                         }
                       },
-                      icon: const Icon(Icons.remove),
+                      icon: Icon(
+                        Icons.remove,
+                        color: ColorConstant.fontColor(context),
+                      ),
                     ),
                     SizedBox(
                       width: 50,
@@ -202,6 +271,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         controller: quantityController,
                         textAlign: TextAlign.center,
                         keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          color: ColorConstant.fontColor(context),
+                        ),
                         onChanged: (value) {
                           final intVal = int.tryParse(value);
                           if (intVal != null && intVal > 0) {
@@ -222,7 +294,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           });
                         }
                       },
-                      icon: const Icon(Icons.add),
+                      icon: Icon(
+                        Icons.add,
+                        color: ColorConstant.fontColor(context),
+                      ),
                     ),
                   ],
                 ),
@@ -235,8 +310,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                       quantity: quantity,
                     );
                   },
-                  color: ColorConstant.greenColor,
-                  child: const Text('Masukkan ke Keranjang', style: TextStyle(color: Colors.white)),
+                  backgroundColor: ColorConstant.primaryColor(context),
+                  foregroundColor: ColorConstant.backgroundColor(context),
+                  child: const Text(
+                    'Masukkan ke Keranjang',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),

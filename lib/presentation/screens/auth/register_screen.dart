@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../common/constants/color_constans.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/button.dart';
 
@@ -9,39 +10,48 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AuthController());
+    final authController = Get.put(AuthController());
 
     return Scaffold(
+      backgroundColor: ColorConstant.backgroundColor(context),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'Daftar ke LibraScan',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: ColorConstant.fontColor(context),
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: controller.loginWithGoogle,
+              onPressed: authController.loginWithGoogle,
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
-                side: const BorderSide(color: Colors.black12),
+                foregroundColor: ColorConstant.primaryColor(context),
+                backgroundColor: ColorConstant.backgroundColor(context),
+                minimumSize: const Size(double.infinity, 56),
+                side: BorderSide(color: ColorConstant.secondaryColor(context)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               icon: const Icon(Icons.g_mobiledata, size: 28),
-              label: const Text('Daftar dengan Google'),
+              label: const Text('Masuk dengan Google'),
             ),
             const SizedBox(height: 16),
-            const Text('atau'),
+            Text(
+              'atau',
+              style: TextStyle(color: ColorConstant.fontColor(context)),
+            ),
             const SizedBox(height: 16),
             MyButton(
               onPressed: () => Get.toNamed('/register-detail'),
-              color: const Color(0xFF2ECC71),
+              backgroundColor: ColorConstant.primaryColor(context),
+              foregroundColor: ColorConstant.backgroundColor(context),
               child: const Text(
                 "Lanjutkan dengan email",
                 style: TextStyle(color: Colors.white),
@@ -51,14 +61,20 @@ class RegisterScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Sudah punya akun? '),
+                Text(
+                  'Sudah punya akun? ',
+                  style: TextStyle(color: ColorConstant.fontColor(context)),
+                ),
                 GestureDetector(
                   onTap: () {
                     Get.offNamed('/login');
                   },
-                  child: const Text(
+                  child: Text(
                     'Masuk',
-                    style: TextStyle(decoration: TextDecoration.underline),
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: ColorConstant.primaryColor(context),
+                    ),
                   ),
                 ),
               ],

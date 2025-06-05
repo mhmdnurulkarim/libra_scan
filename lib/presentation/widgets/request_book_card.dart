@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
+import '../../common/constants/color_constans.dart';
+
 class RequestBookCard extends StatelessWidget {
   final String name;
   final String? email;
@@ -20,10 +22,12 @@ class RequestBookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final primary = ColorConstant.primaryColor(context);
+    final font = ColorConstant.fontColor(context);
 
+    return Container(
       decoration: BoxDecoration(
-        color: Colors.purple.shade50,
+        color: primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
@@ -34,12 +38,15 @@ class RequestBookCard extends StatelessWidget {
             width: 48,
             height: 48,
             color: Colors.grey[400],
-            child: const Icon(Icons.image, color: Colors.white),
+            child: Icon(Icons.image, color: ColorConstant.fontColor(context)),
           ),
         ),
         title: Text(
           name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: font,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,12 +54,18 @@ class RequestBookCard extends StatelessWidget {
             if (email != null)
               Text(
                 email!,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: font.withOpacity(0.7),
+                ),
               ),
             if (date != null)
               Text(
                 _formatDate(date!),
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: font.withOpacity(0.7),
+                ),
               ),
           ],
         ),
@@ -61,11 +74,15 @@ class RequestBookCard extends StatelessWidget {
           children: [
             Text(
               '$books',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: font,
+              ),
             ),
-            const Text(
+            Text(
               'Buku',
-              style: TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: font.withOpacity(0.7)),
             ),
           ],
         ),

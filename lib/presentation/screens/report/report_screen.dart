@@ -167,7 +167,7 @@ class _ReportScreenState extends State<ReportScreen> {
               width: double.infinity,
               child: MyButton(
                 onPressed: _generatePdfReport,
-                color: ColorConstant.greenColor,
+                backgroundColor: ColorConstant.primaryColor(context),
                 child: const Text(
                   "Ekspor Laporan (PDF)",
                   style: TextStyle(color: Colors.white),

@@ -18,7 +18,13 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.role.value == null) {
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        return Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(
+              color: ColorConstant.primaryColor(context),
+            ),
+          ),
+        );
       }
 
       final isAdmin = controller.role.value == 'admin';
@@ -29,18 +35,14 @@ class MainScreen extends StatelessWidget {
         ProfileScreen(),
       ];
 
-      // final children = [
-      //   isAdmin ? HomeAdminScreen() : HomeAdminScreen(),
-      //   isAdmin ? SearchAdminScreen() : SearchAdminScreen(),
-      //   ProfileScreen(),
-      // ];
-
       return Scaffold(
         body: children[controller.currentIndex.value],
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.currentIndex.value,
-          backgroundColor: ColorConstant.whiteColor,
-          showUnselectedLabels: false,
+          backgroundColor: ColorConstant.backgroundColor(context),
+          selectedItemColor: ColorConstant.primaryColor(context),
+          unselectedItemColor: ColorConstant.fontColor(context).withOpacity(0.6),
+          showUnselectedLabels: true,
           type: BottomNavigationBarType.fixed,
           onTap: controller.changeIndex,
           items: const [

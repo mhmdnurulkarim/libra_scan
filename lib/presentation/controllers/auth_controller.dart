@@ -32,7 +32,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Peringatan',
         message: 'Email dan kata sandi wajib diisi',
-        bgColor: ColorConstant.warningColor,
+        backgroundColor: Colors.orange,
+        fontColor: Colors.white,
         icon: Icons.warning_amber_rounded,
       );
       return;
@@ -60,7 +61,8 @@ class AuthController extends GetxController {
         MySnackBar.show(
           title: 'Error',
           message: 'Data pengguna tidak ditemukan.',
-          bgColor: ColorConstant.redColor,
+          backgroundColor: Colors.red,
+          fontColor: Colors.white,
           icon: Icons.error_outline,
         );
         return;
@@ -79,7 +81,8 @@ class AuthController extends GetxController {
         MySnackBar.show(
           title: 'Error',
           message: 'Data akun tidak ditemukan.',
-          bgColor: ColorConstant.redColor,
+          backgroundColor: Colors.red,
+          fontColor: Colors.white,
           icon: Icons.error_outline,
         );
         return;
@@ -92,7 +95,8 @@ class AuthController extends GetxController {
         MySnackBar.show(
           title: 'Akun Nonaktif',
           message: 'Akun Anda telah dinonaktifkan.',
-          bgColor: ColorConstant.redColor,
+          backgroundColor: Colors.red,
+          fontColor: Colors.white,
           icon: Icons.block,
         );
         return;
@@ -111,7 +115,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Login Gagal',
         message: e is FirebaseAuthException ? e.message ?? 'Terjadi kesalahan saat login.' : e.toString(),
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error_outline,
       );
     } finally {
@@ -164,7 +169,8 @@ class AuthController extends GetxController {
           MySnackBar.show(
             title: 'Error',
             message: 'Data akun tidak ditemukan.',
-            bgColor: ColorConstant.redColor,
+            backgroundColor: Colors.red,
+            fontColor: Colors.white,
             icon: Icons.error_outline,
           );
           return;
@@ -177,7 +183,8 @@ class AuthController extends GetxController {
           MySnackBar.show(
             title: 'Akun Nonaktif',
             message: 'Akun Anda telah dinonaktifkan.',
-            bgColor: ColorConstant.redColor,
+            backgroundColor: Colors.red,
+            fontColor: Colors.white,
             icon: Icons.block,
           );
           return;
@@ -202,7 +209,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Google Sign-In Gagal',
         message: e is FirebaseAuthException ? e.message ?? 'Terjadi kesalahan saat login.' : e.toString(),
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.login,
       );
     } finally {
@@ -223,7 +231,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Peringatan',
         message: 'Semua field wajib diisi',
-        bgColor: ColorConstant.warningColor,
+        backgroundColor: Colors.orange,
+        fontColor: Colors.white,
         icon: Icons.warning,
       );
       return;
@@ -266,7 +275,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Sukses',
         message: 'Pendaftaran berhasil!',
-        bgColor: ColorConstant.greenColor,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.check_circle_outline,
       );
 
@@ -275,7 +285,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Gagal Mendaftar',
         message: e.toString(),
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error_outline,
       );
       return;
@@ -297,7 +308,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Peringatan',
         message: 'Semua data wajib diisi',
-        bgColor: ColorConstant.warningColor,
+        backgroundColor: Colors.orange,
+        fontColor: Colors.white,
         icon: Icons.warning,
       );
       return;
@@ -343,7 +355,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Sukses',
         message: 'Akun Google berhasil ditautkan!',
-        bgColor: ColorConstant.greenColor,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.check_circle_outline,
       );
 
@@ -352,7 +365,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Gagal',
         message: e.toString(),
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error_outline,
       );
       return;
@@ -368,7 +382,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: "Error",
         message: "Email wajib diisi",
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.email_outlined,
       );
       return;
@@ -380,7 +395,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: "Berhasil",
         message: "Link reset telah dikirim",
-        bgColor: ColorConstant.greenColor,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.check_circle_outline,
       );
       Get.offNamed('/login');
@@ -388,7 +404,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: "Gagal",
         message: e.toString(),
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error_outline,
       );
       return;
@@ -445,7 +462,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Logout',
         message: 'Berhasil keluar dari akun',
-        bgColor: ColorConstant.greenColor,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.logout,
       );
 
@@ -454,7 +472,8 @@ class AuthController extends GetxController {
       MySnackBar.show(
         title: 'Gagal Logout',
         message: e.toString(),
-        bgColor: ColorConstant.redColor,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error_outline,
       );
     } finally {

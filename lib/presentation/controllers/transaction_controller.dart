@@ -46,7 +46,8 @@ class TransactionController extends GetxController {
           MySnackBar.show(
             title: 'Transaksi Aktif',
             message: 'Anda memiliki transaksi aktif yang sedang berjalan.',
-            bgColor: Colors.orange,
+            backgroundColor: Colors.orange,
+            fontColor: Colors.white,
             icon: Icons.warning,
           );
           return;
@@ -73,7 +74,8 @@ class TransactionController extends GetxController {
           MySnackBar.show(
             title: 'Maksimal Terlampaui',
             message: 'Total buku tidak boleh lebih dari 3.',
-            bgColor: Colors.orange,
+            backgroundColor: Colors.orange,
+            fontColor: Colors.white,
             icon: Icons.warning,
           );
           return;
@@ -120,14 +122,16 @@ class TransactionController extends GetxController {
         title: 'Sukses',
         message:
             'Permintaan peminjaman dikirim. Menunggu persetujuan pustakawan.',
-        bgColor: Colors.green,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.check,
       );
     } catch (e) {
       MySnackBar.show(
         title: 'Error',
         message: 'Gagal mengajukan peminjaman: $e',
-        bgColor: Colors.red,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error,
       );
     }
@@ -162,7 +166,8 @@ class TransactionController extends GetxController {
                 title: 'Akun Ditangguhkan',
                 message:
                     'Anda masih dalam masa suspend akibat keterlambatan pengembalian buku. Silakan coba lagi nanti.',
-                bgColor: Colors.red,
+                backgroundColor: Colors.red,
+                fontColor: Colors.white,
                 icon: Icons.block,
               );
               return true;
@@ -240,7 +245,8 @@ class TransactionController extends GetxController {
     MySnackBar.show(
       title: 'Berhasil',
       message: message,
-      bgColor: Colors.green,
+      backgroundColor: Colors.green,
+      fontColor: Colors.white,
       icon: Icons.check,
     );
   }
@@ -370,14 +376,16 @@ class TransactionController extends GetxController {
         MySnackBar.show(
           title: 'Pengembalian Terlambat',
           message: 'Anda terkena penalty dan disuspend hingga 7 hari ke depan.',
-          bgColor: Colors.orange,
+          backgroundColor: Colors.orange,
+          fontColor: Colors.white,
           icon: Icons.warning,
         );
       } else {
         MySnackBar.show(
           title: 'Pengembalian Berhasil',
           message: 'Buku berhasil dikembalikan tepat waktu.',
-          bgColor: Colors.green,
+          backgroundColor: Colors.green,
+          fontColor: Colors.white,
           icon: Icons.check,
         );
       }
@@ -385,7 +393,8 @@ class TransactionController extends GetxController {
       MySnackBar.show(
         title: 'Berhasil',
         message: (status == 'returned') ? 'Diterima' : 'Ditolak',
-        bgColor: Colors.green,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.check,
       );
     }

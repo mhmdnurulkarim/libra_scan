@@ -11,16 +11,17 @@ class RegisterDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AuthController());
+    final authController = Get.put(AuthController());
 
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null) {
-      controller.emailController.text = args['email'] ?? '';
-      controller.userId = args['user_id'];
-      controller.isFromGoogle = true;
+      authController.emailController.text = args['email'] ?? '';
+      authController.userId = args['user_id'];
+      authController.isFromGoogle = true;
     }
 
     return Scaffold(
+      backgroundColor: ColorConstant.backgroundColor(context),
       appBar: AppBar(
         title: const Text('Daftar ke LibraScan'),
         centerTitle: true,
@@ -31,14 +32,14 @@ class RegisterDetailScreen extends StatelessWidget {
           children: [
             MyTextField(
               label: 'Email',
-              controller: controller.emailController,
+              controller: authController.emailController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Password',
-              controller: controller.passwordController,
+              controller: authController.passwordController,
               obscureText: true,
               keyboardType: TextInputType.visiblePassword,
               showPasswordToggle: true,
@@ -46,55 +47,54 @@ class RegisterDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
             MyTextField(
               label: 'NIK',
-              controller: controller.ninController,
+              controller: authController.ninController,
               obscureText: false,
               keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Nama Lengkap',
-              controller: controller.nameController,
+              controller: authController.nameController,
               obscureText: false,
               keyboardType: TextInputType.name,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Alamat',
-              controller: controller.addressController,
+              controller: authController.addressController,
               obscureText: false,
               keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 16),
             MyTextField(
               label: 'Nomor HP',
-              controller: controller.phoneController,
+              controller: authController.phoneController,
               obscureText: false,
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 32),
             Obx(
-              () => MyButton(
-                onPressed:
-                    controller.isLoading.value
-                        ? null
-                        : controller.isFromGoogle
-                        ? controller.registerWithGoogle
-                        : controller.registerWithEmail,
-                color: ColorConstant.buttonColor,
-                child:
-                    controller.isLoading.value
-                        ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                        : const Text(
-                          'Daftar',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                  () => MyButton(
+                onPressed: authController.isLoading.value
+                    ? null
+                    : authController.isFromGoogle
+                    ? authController.registerWithGoogle
+                    : authController.registerWithEmail,
+                backgroundColor: ColorConstant.primaryColor(context),
+                foregroundColor: ColorConstant.backgroundColor(context),
+                child: authController.isLoading.value
+                    ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                    : Text(
+                  'Daftar',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

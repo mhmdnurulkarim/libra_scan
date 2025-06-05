@@ -11,9 +11,10 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AuthController());
+    final authController = Get.put(AuthController());
 
     return Scaffold(
+      backgroundColor: ColorConstant.backgroundColor(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -21,20 +22,24 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Masuk ke LibraScan",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: ColorConstant.fontColor(context),
+                  ),
                 ),
                 const SizedBox(height: 24),
 
                 // Login dengan Google
                 ElevatedButton.icon(
-                  onPressed: controller.loginWithGoogle,
+                  onPressed: authController.loginWithGoogle,
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 48),
-                    side: const BorderSide(color: Colors.black12),
+                    foregroundColor: ColorConstant.primaryColor(context),
+                    backgroundColor: ColorConstant.backgroundColor(context),
+                    minimumSize: const Size(double.infinity, 56),
+                    side: BorderSide(color: ColorConstant.secondaryColor(context)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -43,13 +48,18 @@ class LoginScreen extends StatelessWidget {
                   label: const Text("Masuk dengan Google"),
                 ),
                 const SizedBox(height: 16),
-                const Center(child: Text("atau masuk dengan email")),
+                Center(
+                  child: Text(
+                    "atau masuk dengan email",
+                    style: TextStyle(color: ColorConstant.fontColor(context)),
+                  ),
+                ),
                 const SizedBox(height: 16),
 
                 // Email
                 MyTextField(
                   label: "Email",
-                  controller: controller.emailController,
+                  controller: authController.emailController,
                   keyboardType: TextInputType.emailAddress,
                   obscureText: false,
                 ),
@@ -58,7 +68,7 @@ class LoginScreen extends StatelessWidget {
                 // Password
                 MyTextField(
                   label: "Password",
-                  controller: controller.passwordController,
+                  controller: authController.passwordController,
                   obscureText: true,
                   keyboardType: TextInputType.visiblePassword,
                   showPasswordToggle: true,
@@ -71,9 +81,12 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () {
                       Get.toNamed('/forgot-password');
                     },
-                    child: const Text(
+                    child: Text(
                       "Lupa kata sandi?",
-                      style: TextStyle(fontSize: 14, color: Colors.black),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: ColorConstant.primaryColor(context),
+                      ),
                     ),
                   ),
                 ),
@@ -81,26 +94,25 @@ class LoginScreen extends StatelessWidget {
 
                 // Tombol Login
                 Obx(
-                  () => MyButton(
-                    onPressed:
-                        controller.isLoading.value
-                            ? null
-                            : controller.loginWithEmail,
-                    color: ColorConstant.buttonColor,
-                    child:
-                        controller.isLoading.value
-                            ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                            : const Text(
-                              "Masuk",
-                              style: TextStyle(color: Colors.white),
-                            ),
+                      () => MyButton(
+                    onPressed: authController.isLoading.value
+                        ? null
+                        : authController.loginWithEmail,
+                        backgroundColor: ColorConstant.primaryColor(context),
+                        foregroundColor: ColorConstant.backgroundColor(context),
+                    child: authController.isLoading.value
+                        ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : Text(
+                      "Masuk",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -109,14 +121,18 @@ class LoginScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Belum punya akun? "),
+                    Text(
+                      "Belum punya akun? ",
+                      style: TextStyle(color: ColorConstant.fontColor(context)),
+                    ),
                     GestureDetector(
-                      onTap: () {
-                        Get.offNamed('/register');
-                      },
-                      child: const Text(
+                      onTap: () => Get.offNamed('/register'),
+                      child: Text(
                         "Daftar",
-                        style: TextStyle(decoration: TextDecoration.underline),
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: ColorConstant.primaryColor(context),
+                        ),
                       ),
                     ),
                   ],

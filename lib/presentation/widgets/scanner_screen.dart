@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libra_scan/common/constants/color_constans.dart';
 import 'package:libra_scan/presentation/widgets/snackbar.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:get/get.dart';
@@ -40,16 +41,21 @@ class _ScannerScreenState extends State<ScannerScreen> {
               final bookData = await bookController.getBook(code);
 
               if (bookData != null) {
-                Get.offNamed('/book-detail', arguments: bookData);
+                if (mounted) {
+                  Get.offNamed('/book-detail', arguments: bookData);
+                }
               } else {
-                Get.back();
-                MySnackBar.show(
-                  title: 'Buku Tidak Ditemukan',
-                  message: 'Buku dengan barcode ini tidak ditemukan.',
-                  bgColor: Colors.red,
-                  icon: Icons.close,
-                );
-                return;
+                if (mounted) {
+                  Get.back();
+
+                  MySnackBar.show(
+                    title: 'Buku Tidak Ditemukan',
+                    message: 'Buku dengan barcode ini tidak ditemukan.',
+                    backgroundColor: ColorConstant.dangerColor(context),
+                    fontColor: ColorConstant.fontColor(context),
+                    icon: Icons.close,
+                  );
+                }
               }
             }
           }

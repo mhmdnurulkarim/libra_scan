@@ -64,7 +64,8 @@ class BookController extends GetxController {
         MySnackBar.show(
           title: 'Sukses',
           message: 'Buku berhasil ditambahkan',
-          bgColor: Colors.green,
+          backgroundColor: Colors.green,
+          fontColor: Colors.white,
           icon: Icons.check,
         );
       }
@@ -73,7 +74,8 @@ class BookController extends GetxController {
       MySnackBar.show(
         title: 'Error',
         message: 'Gagal menyimpan buku: $e',
-        bgColor: Colors.red,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error,
       );
     }
@@ -87,7 +89,8 @@ class BookController extends GetxController {
       MySnackBar.show(
         title: 'Sukses',
         message: 'Buku berhasil ditambahkan',
-        bgColor: Colors.green,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
         icon: Icons.check,
       );
 
@@ -96,7 +99,8 @@ class BookController extends GetxController {
       MySnackBar.show(
         title: 'Error',
         message: 'Gagal menambahkan buku: $e',
-        bgColor: Colors.red,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error,
       );
     }
@@ -108,13 +112,16 @@ class BookController extends GetxController {
       MySnackBar.show(
         title: 'Berhasil',
         message: 'Data buku diperbarui',
-        bgColor: Colors.green,
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
+        icon: Icons.check,
       );
     } catch (e) {
       MySnackBar.show(
         title: 'Error',
         message: 'Gagal update: $e',
-        bgColor: Colors.red,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error,
       );
     }
@@ -137,7 +144,9 @@ class BookController extends GetxController {
         MySnackBar.show(
           title: 'Berhasil',
           message: 'Buku berhasil dihapus',
-          bgColor: Colors.green,
+          backgroundColor: Colors.green,
+          fontColor: Colors.white,
+          icon: Icons.check,
         );
 
         Get.back(result: true);
@@ -146,7 +155,8 @@ class BookController extends GetxController {
       MySnackBar.show(
         title: 'Error',
         message: 'Gagal hapus: $e',
-        bgColor: Colors.red,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error,
       );
     }

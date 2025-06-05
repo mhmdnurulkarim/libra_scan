@@ -11,38 +11,51 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AuthController());
+    final authController = Get.put(AuthController());
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Lupa Kata Sandi"), centerTitle: true),
+      backgroundColor: ColorConstant.backgroundColor(context),
+      appBar: AppBar(
+        title: const Text("Lupa Kata Sandi"),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Masukkan email untuk reset Password."),
+            Text(
+              "Masukkan email untuk reset Password.",
+              style: TextStyle(color: ColorConstant.fontColor(context)),
+            ),
             const SizedBox(height: 16),
             MyTextField(
               label: "Email",
-              controller: controller.emailController,
+              controller: authController.emailController,
               keyboardType: TextInputType.emailAddress,
               obscureText: false,
             ),
             const SizedBox(height: 24),
             Obx(
-              () => MyButton(
-                onPressed:
-                    controller.isLoading.value
-                        ? null
-                        : controller.forgotPassword,
-                color: ColorConstant.buttonColor,
-                child:
-                    controller.isLoading.value
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                          "Kirim Link Reset",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                  () => MyButton(
+                onPressed: authController.isLoading.value
+                    ? null
+                    : authController.forgotPassword,
+                    backgroundColor: ColorConstant.primaryColor(context),
+                    foregroundColor: ColorConstant.backgroundColor(context),
+                child: authController.isLoading.value
+                    ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                    : Text(
+                  "Kirim Link Reset",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

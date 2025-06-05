@@ -34,21 +34,35 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cari Buku')),
+      appBar: AppBar(
+        title: const Text("Cari Buku"),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
+              cursorColor: ColorConstant.primaryColor(context),
               decoration: InputDecoration(
                 hintText: 'Mencari Buku Apa?',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: const Color(0xFFF3EFFF),
+                fillColor: ColorConstant.backgroundColor(context),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: ColorConstant.primaryColor(context),
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
@@ -58,7 +72,15 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
               final books = controller.filteredBooks;
 
               if (books.isEmpty) {
-                return const Center(child: Text('Tidak ada buku ditemukan.'));
+                return Center(
+                  child: Text(
+                    'Tidak ada buku ditemukan.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ColorConstant.fontColor(context),
+                    ),
+                  ),
+                );
               }
 
               return ListView.builder(
@@ -85,12 +107,13 @@ class _SearchAdminScreenState extends State<SearchAdminScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: ColorConstant.whiteColor,
-        child: Icon(Icons.add, color: ColorConstant.blackColor),
+        backgroundColor: ColorConstant.primaryColor(context),
+        child: Icon(Icons.add, color: Colors.white),
         onPressed: () async {
-          final result = await Get.toNamed('/book-management', arguments: {
-            'from': 'search',
-          });
+          final result = await Get.toNamed(
+            '/book-management',
+            arguments: {'from': 'search'},
+          );
           if (result == true) {
             controller.fetchBooks();
           }

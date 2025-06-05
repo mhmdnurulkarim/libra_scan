@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:libra_scan/presentation/widgets/item_card.dart';
 import 'package:libra_scan/presentation/widgets/member_card.dart';
 
 import '../../../common/constants/color_constans.dart';
@@ -59,13 +60,14 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Pengaturan
-                settingItem(
-                  'Bahasa Indonesia',
+                ItemCard(
+                  title: 'Bahasa Indonesia',
                   onTap: () {
                     MySnackBar.show(
                       title: 'Dalam Pengembangan',
                       message: 'Fitur ini sedang dalam pengembangan',
-                      bgColor: ColorConstant.warningColor,
+                      backgroundColor: Colors.orange,
+                      fontColor: Colors.white,
                       icon: Icons.warning_amber_rounded,
                     );
                   },
@@ -81,26 +83,28 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                settingItem(
-                  'Laporan',
+                ItemCard(
+                  title: 'Laporan',
                   onTap: () {
                     MySnackBar.show(
                       title: 'Dalam Pengembangan',
                       message: 'Fitur ini sedang dalam pengembangan',
-                      bgColor: ColorConstant.warningColor,
+                      backgroundColor: Colors.orange,
+                      fontColor: Colors.white,
                       icon: Icons.warning_amber_rounded,
                     );
                     // Get.toNamed("/report");
                   },
                 ),
                 const SizedBox(height: 16),
-                settingItem(
-                  'Tentang Developer',
+                ItemCard(
+                  title: 'Tentang Developer',
                   onTap: () {
                     MySnackBar.show(
                       title: 'Dalam Pengembangan',
                       message: 'Fitur ini sedang dalam pengembangan',
-                      bgColor: ColorConstant.warningColor,
+                      backgroundColor: Colors.orange,
+                      fontColor: Colors.white,
                       icon: Icons.warning_amber_rounded,
                     );
                     // Get.toNamed("/about");
@@ -111,7 +115,7 @@ class ProfileScreen extends StatelessWidget {
                 Obx(
                   () => MyButton(
                     onPressed: () => authController.logout(),
-                    color: ColorConstant.redColor,
+                    backgroundColor: ColorConstant.dangerColor(context),
                     child:
                         authController.isLoading.value
                             ? const CircularProgressIndicator(
@@ -128,16 +132,6 @@ class ProfileScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget settingItem(String title, {required VoidCallback onTap}) {
-    return ListTile(
-      tileColor: Colors.pink.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../common/constants/color_constans.dart';
 import '../../../data/share_preference.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -31,13 +32,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: ColorConstant.primaryColor(context),
       body: Center(
         child: Text(
           'LibraScan',
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
+            color: ColorConstant.backgroundColor(context),
           ),
         ),
       ),

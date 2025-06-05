@@ -58,9 +58,10 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
   }
 
   void _loadCategories() async {
-    final selectedRef = (bookData != null && bookData!['category_id'] is DocumentReference)
-        ? bookData!['category_id'] as DocumentReference
-        : null;
+    final selectedRef =
+        (bookData != null && bookData!['category_id'] is DocumentReference)
+            ? bookData!['category_id'] as DocumentReference
+            : null;
 
     final snapshot = await controller.getAllCategories();
     final docs = snapshot.docs;
@@ -92,7 +93,8 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
       MySnackBar.show(
         title: 'Validasi Gagal',
         message: 'Semua field wajib diisi kecuali sinopsis.',
-        bgColor: Colors.red,
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
         icon: Icons.error,
       );
       return;
@@ -124,7 +126,10 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manajemen Buku')),
+      appBar: AppBar(
+        title: const Text('Manajemen Buku'),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -155,17 +160,27 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<DocumentSnapshot>(
-                  value: categories.any((cat) => cat.reference.path == selectedCategory?.reference.path)
-                      ? categories.firstWhere((cat) => cat.reference.path == selectedCategory?.reference.path)
-                      : null,
-                  items: categories.map((category) {
-                    final id = category.id;
-                    final genre = category['genre'];
-                    return DropdownMenuItem<DocumentSnapshot>(
-                      value: category,
-                      child: Text('$id - $genre'),
-                    );
-                  }).toList(),
+                  value:
+                      categories.any(
+                            (cat) =>
+                                cat.reference.path ==
+                                selectedCategory?.reference.path,
+                          )
+                          ? categories.firstWhere(
+                            (cat) =>
+                                cat.reference.path ==
+                                selectedCategory?.reference.path,
+                          )
+                          : null,
+                  items:
+                      categories.map((category) {
+                        final id = category.id;
+                        final genre = category['genre'];
+                        return DropdownMenuItem<DocumentSnapshot>(
+                          value: category,
+                          child: Text('$id - $genre'),
+                        );
+                      }).toList(),
                   onChanged: (value) {
                     setState(() {
                       selectedCategory = value;
@@ -175,7 +190,9 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                     labelText: 'Kategori *',
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
                     ),
@@ -196,13 +213,15 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                     const SizedBox(width: 8),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorConstant.greenColor,
+                        backgroundColor: ColorConstant.primaryColor(context),
+                        foregroundColor: ColorConstant.backgroundColor(context),
+                        minimumSize: const Size(8, 56),
+                        side: BorderSide(color: ColorConstant.secondaryColor(context)),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       onPressed: () async {
@@ -216,7 +235,9 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                       },
                       child: Text(
                         'Scan Barcode',
-                        style: TextStyle(color: ColorConstant.whiteColor),
+                        style: TextStyle(
+                          color: ColorConstant.backgroundColor(context),
+                        ),
                       ),
                     ),
                   ],
@@ -239,20 +260,24 @@ class _BookManagementScreenState extends State<BookManagementScreen> {
                 const SizedBox(height: 24),
                 MyButton(
                   onPressed: _submitBook,
-                  color: ColorConstant.greenColor,
+                  backgroundColor: ColorConstant.primaryColor(context),
                   child: Text(
                     bookData != null ? 'Edit' : 'Tambah',
-                    style: TextStyle(color: ColorConstant.whiteColor),
+                    style: TextStyle(
+                      color: ColorConstant.backgroundColor(context),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 if (bookData != null && !isFromSearch)
                   MyButton(
                     onPressed: _deleteBook,
-                    color: ColorConstant.redColor,
+                    backgroundColor: ColorConstant.dangerColor(context),
                     child: Text(
                       'Hapus',
-                      style: TextStyle(color: ColorConstant.whiteColor),
+                      style: TextStyle(
+                        color: ColorConstant.backgroundColor(context),
+                      ),
                     ),
                   ),
               ],

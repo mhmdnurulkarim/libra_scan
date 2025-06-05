@@ -5,7 +5,8 @@ class MySnackBar {
   static void show({
     required String title,
     required String message,
-    required Color bgColor,
+    required Color backgroundColor,
+    required Color fontColor,
     IconData? icon,
   }) {
     Get.snackbar(
@@ -13,14 +14,14 @@ class MySnackBar {
       '',
       titleText: Row(
         children: [
-          Icon(icon ?? Icons.info, color: Colors.white),
+          Icon(icon ?? Icons.info, color: fontColor),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: fontColor,
               ),
             ),
           ),
@@ -28,10 +29,10 @@ class MySnackBar {
       ),
       messageText: Text(
         message,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: fontColor),
       ),
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: bgColor,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: backgroundColor,
       margin: const EdgeInsets.all(10),
       borderRadius: 10,
       padding: const EdgeInsets.all(16),

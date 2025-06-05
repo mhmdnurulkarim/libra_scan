@@ -24,8 +24,16 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
     final String? transactionId = args['transaction_id'];
 
     if (transactionId == null) {
-      return const Scaffold(
-        body: Center(child: Text('ID Transaksi tidak ditemukan')),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'ID Transaksi tidak ditemukan',
+            style: TextStyle(
+              fontSize: 16,
+              color: ColorConstant.fontColor(context),
+            ),
+          ),
+        ),
       );
     }
 
@@ -38,13 +46,25 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
         ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                color: ColorConstant.primaryColor(context),
+              ),
+            );
           }
 
           if (snapshot.hasError ||
               !snapshot.hasData ||
               snapshot.data!.isEmpty) {
-            return const Center(child: Text('Gagal memuat data transaksi.'));
+            return Center(
+              child: Text(
+                'Gagal memuat data transaksi.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ColorConstant.fontColor(context),
+                ),
+              ),
+            );
           }
 
           final data = snapshot.data!;
@@ -96,9 +116,10 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                         Center(
                           child: Text(
                             'Denda masih ${estimateReturn.toDate().difference(DateTime.now()).inDays} Hari lagi\nHingga tanggal ${estimateReturn.toDate().day}/${(estimateReturn.toDate().month)}/${estimateReturn.toDate().year}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: ColorConstant.fontColor(context),
                             ),
                           ),
                         ),
@@ -114,7 +135,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                           transactionId,
                           'borrowed',
                         ),
-                    color: ColorConstant.greenColor,
+                    backgroundColor: ColorConstant.primaryColor(context),
                     child: const Text(
                       'Setuju Untuk Peminjaman Buku',
                       style: TextStyle(color: Colors.white),
@@ -127,7 +148,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                           transactionId,
                           'booking',
                         ),
-                    color: ColorConstant.primaryColor,
+                    backgroundColor: ColorConstant.primaryColor(context),
                     child: const Text(
                       'Setuju Untuk Booking Buku',
                       style: TextStyle(color: Colors.white),
@@ -140,7 +161,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                           transactionId,
                           'returned',
                         ),
-                    color: ColorConstant.greenColor,
+                    backgroundColor: ColorConstant.primaryColor(context),
                     child: const Text(
                       'Menerima Pengembalian Buku',
                       style: TextStyle(color: Colors.white),

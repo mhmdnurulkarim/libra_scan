@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../common/constants/color_constans.dart';
 
 class MyTextField extends StatefulWidget {
   final String label;
@@ -19,10 +20,10 @@ class MyTextField extends StatefulWidget {
   });
 
   @override
-  State<MyTextField> createState() => MyTextFieldState();
+  State<MyTextField> createState() => _MyTextFieldState();
 }
 
-class MyTextFieldState extends State<MyTextField> {
+class _MyTextFieldState extends State<MyTextField> {
   late FocusNode _focusNode;
   bool _isObscure = true;
 
@@ -59,24 +60,41 @@ class MyTextFieldState extends State<MyTextField> {
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
       maxLines: widget.maxLines,
+      cursorColor: ColorConstant.primaryColor(context),
+      style: TextStyle(color: ColorConstant.fontColor(context)),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: ColorConstant.backgroundColor(context),
         labelText: widget.label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+        labelStyle: TextStyle(
+          color:
+              _focusNode.hasFocus
+                  ? ColorConstant.primaryColor(context)
+                  : Colors.grey,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
         ),
-        suffixIcon: widget.showPasswordToggle
-            ? _buildSuffixIcon()
-            : null,
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: ColorConstant.primaryColor(context),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        suffixIcon: widget.showPasswordToggle ? _buildSuffixIcon() : null,
       ),
     );
   }
 
   Widget _buildSuffixIcon() {
     return IconButton(
-      icon: _isObscure ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
+      icon: Icon(
+        _isObscure ? Icons.visibility_off : Icons.visibility,
+        color: ColorConstant.primaryColor(context),
+      ),
       onPressed: _toggleObscureText,
     );
   }

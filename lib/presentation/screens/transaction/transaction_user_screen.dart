@@ -23,8 +23,16 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
     final String? transactionId = args['transaction_id'];
 
     if (transactionId == null) {
-      return const Scaffold(
-        body: Center(child: Text('ID Transaksi tidak ditemukan')),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'ID Transaksi tidak ditemukan',
+            style: TextStyle(
+              fontSize: 16,
+              color: ColorConstant.fontColor(context),
+            ),
+          ),
+        ),
       );
     }
 
@@ -34,13 +42,25 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
         future: transactionController.loadTransactionData(transactionId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                color: ColorConstant.primaryColor(context),
+              ),
+            );
           }
 
           if (snapshot.hasError ||
               !snapshot.hasData ||
               snapshot.data!.isEmpty) {
-            return const Center(child: Text('Gagal memuat data transaksi.'));
+            return Center(
+              child: Text(
+                'Gagal memuat data transaksi.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ColorConstant.fontColor(context),
+                ),
+              ),
+            );
           }
 
           final data = snapshot.data!;
@@ -75,9 +95,10 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                       Center(
                         child: Text(
                           'Harus dikembalikan sebelum ${estimateReturn.toDate().day}/${estimateReturn.toDate().month}/${estimateReturn.toDate().year}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: ColorConstant.fontColor(context),
                           ),
                         ),
                       ),
@@ -90,14 +111,15 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (currentStatus == 'waiting for borrow' || currentStatus == 'waiting for booking') ...[
+                    if (currentStatus == 'draft') ...[
                       MyButton(
                         onPressed:
                             () => transactionController.updateTransactionStatus(
                               transactionId,
                               'waiting for borrow',
                             ),
-                        color: ColorConstant.greenColor,
+                        backgroundColor: ColorConstant.primaryColor(context),
+                        foregroundColor: Colors.white,
                         child: const Text(
                           'Ajukan Peminjaman',
                           style: TextStyle(color: Colors.white),
@@ -110,10 +132,13 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                               transactionId,
                               'waiting for booking',
                             ),
-                        color: ColorConstant.primaryColor,
-                        child: const Text(
+                        backgroundColor: ColorConstant.backgroundColor(context),
+                        foregroundColor: ColorConstant.primaryColor(context),
+                        child: Text(
                           'Ajukan Booking',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: ColorConstant.fontColor(context),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -124,8 +149,8 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                               transactionId,
                               'take a book',
                             ),
-                        color: ColorConstant.primaryColor,
-                        child: const Text(
+                        backgroundColor: ColorConstant.primaryColor(context),
+                        child: Text(
                           'Ajukan Pengambilan Buku (Booking)',
                           style: TextStyle(color: Colors.white),
                         ),
@@ -138,7 +163,7 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                               transactionId,
                               'waiting for return',
                             ),
-                        color: ColorConstant.greenColor,
+                        backgroundColor: ColorConstant.primaryColor(context),
                         child: const Text(
                           'Ajukan Pengembalian',
                           style: TextStyle(color: Colors.white),
