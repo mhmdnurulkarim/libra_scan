@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/constants/color_constans.dart';
+import '../../utils/utils.dart';
 
 class RequestBookCard extends StatelessWidget {
   final String name;
@@ -22,50 +23,40 @@ class RequestBookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = ColorConstant.primaryColor(context);
-    final font = ColorConstant.fontColor(context);
+    final backgroundColor = ColorConstant.primaryColor(context);
+    final fontColor = Colors.white;
+    final borderColor = ColorConstant.secondaryColor(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            width: 48,
-            height: 48,
-            color: Colors.grey[400],
-            child: Icon(Icons.image, color: ColorConstant.fontColor(context)),
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: ColorConstant.secondaryColor(context),
+            borderRadius: BorderRadius.circular(8),
           ),
+          child: Icon(Icons.image, color: fontColor),
         ),
         title: Text(
           name,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: font,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600, color: fontColor),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (email != null)
-              Text(
-                email!,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: font.withOpacity(0.7),
-                ),
-              ),
+              Text(email!, style: TextStyle(fontSize: 12, color: fontColor)),
             if (date != null)
               Text(
-                _formatDate(date!),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: font.withOpacity(0.7),
-                ),
+                formatDate(date!),
+                style: TextStyle(fontSize: 12, color: fontColor),
               ),
           ],
         ),
@@ -77,22 +68,14 @@ class RequestBookCard extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: font,
+                color: fontColor,
               ),
             ),
-            Text(
-              'Buku',
-              style: TextStyle(fontSize: 12, color: font.withOpacity(0.7)),
-            ),
+            Text('Buku', style: TextStyle(fontSize: 12, color: fontColor)),
           ],
         ),
         onTap: onTap,
       ),
     );
-  }
-
-  String _formatDate(Timestamp timestamp) {
-    final dateTime = timestamp.toDate();
-    return DateFormat('dd MMM yyyy').format(dateTime);
   }
 }

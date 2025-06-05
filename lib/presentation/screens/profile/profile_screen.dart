@@ -22,14 +22,26 @@ class ProfileScreen extends StatelessWidget {
       future: LocalStorage.getUserData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(
+                color: ColorConstant.primaryColor(context),
+              ),
+            ),
           );
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Scaffold(
-            body: Center(child: Text('Data akun tidak tersedia')),
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'Data akun tidak tersedia',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ColorConstant.fontColor(context),
+                ),
+              ),
+            ),
           );
         }
 
@@ -74,12 +86,29 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Obx(
-                  () => SwitchListTile(
-                    title: const Text('Tema Gelap'),
-                    value: localeController.themeMode.value == ThemeMode.dark,
-                    onChanged: (val) {
-                      localeController.toggleTheme(val);
-                    },
+                  () => Container(
+                    decoration: BoxDecoration(
+                      color: ColorConstant.primaryColor(context),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: ColorConstant.secondaryColor(context),
+                      ),
+                    ),
+                    child: SwitchListTile(
+                      title: Text(
+                        'Tema Gelap',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      value: localeController.themeMode.value == ThemeMode.dark,
+                      onChanged: (val) {
+                        localeController.toggleTheme(val);
+                      },
+                      activeColor: ColorConstant.secondaryColor(context),
+                      activeTrackColor: Colors.white60,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -116,6 +145,7 @@ class ProfileScreen extends StatelessWidget {
                   () => MyButton(
                     onPressed: () => authController.logout(),
                     backgroundColor: ColorConstant.dangerColor(context),
+                    borderColor: Colors.redAccent,
                     child:
                         authController.isLoading.value
                             ? const CircularProgressIndicator(

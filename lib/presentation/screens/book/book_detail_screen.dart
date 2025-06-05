@@ -90,6 +90,15 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       appBar: AppBar(
         title: const Text('Detail Buku'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.local_mall),
+            onPressed: () {
+              Get.toNamed('/transaction-user');
+            },
+            tooltip: 'Transaksi Saya',
+          ),
+        ],
       ),
       backgroundColor: ColorConstant.backgroundColor(context),
       body: Padding(

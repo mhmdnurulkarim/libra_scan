@@ -26,17 +26,20 @@ class _SearchScreenState extends State<SearchUserScreen> {
   }
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Cari Buku"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.local_mall),
+            onPressed: () {
+              Get.toNamed('/transaction-user');
+            },
+            tooltip: 'Transaksi Saya',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -71,41 +74,56 @@ class _SearchScreenState extends State<SearchUserScreen> {
             child: Obx(() {
               final books = controller.filteredBooks;
 
-              if (books.isEmpty) {
-                return Center(
-                  child: Text(
-                    'Tidak ada buku ditemukan.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: ColorConstant.fontColor(context),
-                    ),
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  final book = books[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    child: BookCard(
-                      title: book['title'],
-                      author: book['author'],
-                      onTap: () {
-                        Get.toNamed('/book-detail', arguments: book);
-                      },
-                    ),
-                  );
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await controller.fetchBooks();
                 },
+                color: ColorConstant.primaryColor(context),
+                child: books.isEmpty
+                    ? ListView(
+                  children: [
+                    SizedBox(height: 100),
+                    Center(
+                      child: Text(
+                        'Tidak ada buku ditemukan.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: ColorConstant.fontColor(context),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+                    : ListView.builder(
+                  itemCount: books.length,
+                  itemBuilder: (context, index) {
+                    final book = books[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: BookCard(
+                        title: book['title'],
+                        author: book['author'],
+                        onTap: () {
+                          Get.toNamed('/book-detail', arguments: book);
+                        },
+                      ),
+                    );
+                  },
+                ),
               );
             }),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

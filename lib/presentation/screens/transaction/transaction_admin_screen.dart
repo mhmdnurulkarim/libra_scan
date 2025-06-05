@@ -5,6 +5,7 @@ import 'package:libra_scan/presentation/controllers/transaction_controller.dart'
 import 'package:libra_scan/presentation/widgets/member_card.dart';
 
 import '../../../common/constants/color_constans.dart';
+import '../../../utils/utils.dart';
 import '../../widgets/book_card.dart';
 import '../../widgets/button.dart';
 
@@ -103,19 +104,22 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                   child: ListView(
                     children: [
                       ...books.map(
-                        (book) => BookCard(
-                          title: book['title'],
-                          author: book['author'],
-                          onTap: () {
-                            Get.toNamed('/book-detail', arguments: book);
-                          },
+                        (book) => Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: BookCard(
+                            title: book['title'],
+                            author: book['author'],
+                            onTap: () {
+                              Get.toNamed('/book-detail', arguments: book);
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
                       if (estimateReturn != null)
                         Center(
                           child: Text(
-                            'Denda masih ${estimateReturn.toDate().difference(DateTime.now()).inDays} Hari lagi\nHingga tanggal ${estimateReturn.toDate().day}/${(estimateReturn.toDate().month)}/${estimateReturn.toDate().year}',
+                            'Harus dikembalikan sebelum ${formatDate(estimateReturn)}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -167,6 +171,8 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
+                ] else ...[
+                  const SizedBox(),
                 ],
               ],
             ),

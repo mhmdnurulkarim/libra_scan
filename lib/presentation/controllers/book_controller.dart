@@ -10,7 +10,7 @@ class BookController extends GetxController {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void fetchBooks() async {
+  Future<void> fetchBooks() async {
     try {
       final snapshot = await _firestore.collection('book').get();
 

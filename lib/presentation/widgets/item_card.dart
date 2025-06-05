@@ -14,7 +14,7 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final backgroundColor = ColorConstant.primaryColor(context);
-    final fontColor = ColorConstant.backgroundColor(context);
+    final fontColor = Colors.white;
     final borderColor = ColorConstant.secondaryColor(context);
 
     return Container(
@@ -31,7 +31,7 @@ class ItemCard extends StatelessWidget {
             color: fontColor,
           ),
         ),
-        trailing: Icon(Icons.arrow_forward_ios, color: fontColor.withOpacity(0.8)),
+        trailing: Icon(Icons.arrow_forward_ios, color: fontColor),
         onTap: onTap,
       ),
     );

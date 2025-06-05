@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/common/constants/color_constans.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
+import 'package:libra_scan/utils/utils.dart';
 
 import '../../controllers/transaction_controller.dart';
 import '../../widgets/book_card.dart';
@@ -73,13 +74,11 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
             children: [
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.all(16),
                   children: [
                     ...books.map(
                       (book) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
+                        padding: const EdgeInsets.only(
+                          bottom: 16,
                         ),
                         child: BookCard(
                           title: book['title'],
@@ -90,11 +89,11 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     if (estimateReturn != null)
                       Center(
                         child: Text(
-                          'Harus dikembalikan sebelum ${estimateReturn.toDate().day}/${estimateReturn.toDate().month}/${estimateReturn.toDate().year}',
+                          'Harus dikembalikan sebelum ${formatDate(estimateReturn)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -170,7 +169,10 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                         ),
                       ),
                     ] else ...[
-                      const SizedBox(),
+                      Text(
+                        'Menunggu Persetujuan Petugas Perpustakaan',
+                        style: TextStyle(color: ColorConstant.fontColor(context)),
+                      ),
                     ],
                   ],
                 ),

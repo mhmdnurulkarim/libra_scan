@@ -32,13 +32,13 @@ class MemberCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 80,
-            height: 80,
+            width: 100,
+            height: 140,
             decoration: BoxDecoration(
-              color: Colors.grey[400],
+              color: ColorConstant.secondaryColor(context),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.person, size: 48, color: Colors.white),
+            child: const Icon(Icons.person, size: 72, color: Colors.white),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -46,32 +46,26 @@ class MemberCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  nin,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  'NIK: $nin',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
-                  name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: ColorConstant.fontColor(context),
-                  ),
-                ),
-                Text(
-                  email,
-                  style: const TextStyle(fontSize: 12),
+                  'Nama: $name',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  phoneNumber,
-                  style: const TextStyle(fontSize: 12),
+                  'Email: $email',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  role.toLowerCase(),
-                  style: const TextStyle(fontSize: 12),
+                  'Nomor HP: $phoneNumber',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
+                ),
+                Text(
+                  'Role: ${role.toLowerCase()}',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 Column(
@@ -79,12 +73,17 @@ class MemberCard extends StatelessWidget {
                     Container(
                       height: 40,
                       color: Colors.grey[300],
-                      child: const Center(child: Text('Barcode')),
+                      child: const Center(
+                        child: Text(
+                          'Barcode',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       userId,
-                      style: const TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

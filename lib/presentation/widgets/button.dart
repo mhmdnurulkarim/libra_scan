@@ -7,6 +7,7 @@ class MyButton extends StatelessWidget {
   final Widget child;
   final Color? backgroundColor;
   final Color? foregroundColor;
+  final Color? borderColor;
 
   const MyButton({
     super.key,
@@ -14,6 +15,7 @@ class MyButton extends StatelessWidget {
     required this.child,
     this.backgroundColor,
     this.foregroundColor,
+    this.borderColor,
   });
 
   @override
@@ -23,7 +25,7 @@ class MyButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        side: BorderSide(color: ColorConstant.secondaryColor(context)),
+        side: BorderSide(color: borderColor ?? ColorConstant.secondaryColor(context)),
         minimumSize: const Size(double.infinity, 56),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
