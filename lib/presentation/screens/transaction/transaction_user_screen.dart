@@ -6,7 +6,7 @@ import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:libra_scan/utils/utils.dart';
 
 import '../../controllers/transaction_controller.dart';
-import '../../widgets/book_card.dart';
+import '../../widgets/request_book_card.dart';
 
 class TransactionUserScreen extends StatefulWidget {
   const TransactionUserScreen({super.key});
@@ -75,20 +75,59 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
               Expanded(
                 child: ListView(
                   children: [
-                    ...books.map(
-                      (book) => Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: 16,
+                    ...books.map((book) {
+                      return Dismissible(
+                        key: Key(book['detail_id']),
+                        direction: DismissDirection.endToStart,
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder:
+                                (context) => AlertDialog(
+                                  title: const Text('Konfirmasi'),
+                                  content: const Text(
+                                    'Apakah kamu yakin ingin menghapus buku ini dari transaksi?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () =>
+                                              Navigator.of(context).pop(false),
+                                      child: const Text('Batal'),
+                                    ),
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.of(context).pop(true),
+                                      child: const Text('Hapus'),
+                                    ),
+                                  ],
+                                ),
+                          );
+                        },
+                        onDismissed: (direction) {
+                          transactionController.removeBookFromTransaction(
+                              transactionId, book['detail_id']
+                          );
+                        },
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          color: Colors.red,
+                          child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                        child: BookCard(
-                          title: book['title'],
-                          author: book['author'],
-                          onTap: () {
-                            Get.toNamed('/book-detail', arguments: book);
-                          },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 16,
+                          ),
+                          child: RequestBookCard(
+                            name: book['title'],
+                            email: book['author'],
+                            books: book['quantity'],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                     const SizedBox(height: 16),
                     if (estimateReturn != null)
                       Center(
@@ -171,7 +210,9 @@ class _TransactionUserScreenState extends State<TransactionUserScreen> {
                     ] else ...[
                       Text(
                         'Menunggu Persetujuan Petugas Perpustakaan',
-                        style: TextStyle(color: ColorConstant.fontColor(context)),
+                        style: TextStyle(
+                          color: ColorConstant.fontColor(context),
+                        ),
                       ),
                     ],
                   ],

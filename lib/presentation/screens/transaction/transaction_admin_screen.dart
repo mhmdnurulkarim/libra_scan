@@ -6,8 +6,8 @@ import 'package:libra_scan/presentation/widgets/member_card.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../../utils/utils.dart';
-import '../../widgets/book_card.dart';
 import '../../widgets/button.dart';
+import '../../widgets/request_book_card.dart';
 
 class TransactionAdminScreen extends StatefulWidget {
   const TransactionAdminScreen({super.key});
@@ -87,7 +87,10 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
           final barcode = userData['barcode'] ?? '';
 
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 16,
+            ),
             child: Column(
               children: [
                 MemberCard(
@@ -104,17 +107,16 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                   child: ListView(
                     children: [
                       ...books.map(
-                        (book) => Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: BookCard(
-                            title: book['title'],
-                            author: book['author'],
+                        (book) =>
+                            RequestBookCard(
+                              name: book['title'],
+                              email: book['author'],
+                              books: book['quantity'],
                             onTap: () {
                               Get.toNamed('/book-detail', arguments: book);
                             },
                           ),
                         ),
-                      ),
                       const SizedBox(height: 24),
                       if (estimateReturn != null)
                         Center(

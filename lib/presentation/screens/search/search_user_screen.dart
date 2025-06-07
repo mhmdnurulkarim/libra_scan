@@ -3,7 +3,10 @@ import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/book_card.dart';
 
 import '../../../common/constants/color_constans.dart';
+import '../../../data/share_preference.dart';
 import '../../controllers/book_controller.dart';
+import '../../controllers/main_controller.dart';
+import '../../controllers/transaction_controller.dart';
 
 class SearchUserScreen extends StatefulWidget {
   const SearchUserScreen({super.key});
@@ -14,31 +17,55 @@ class SearchUserScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchUserScreen> {
   final controller = Get.put(BookController());
+  final transactionController = Get.put(TransactionController());
+  final mainController = Get.find<MainScreenController>();
   final TextEditingController _searchController = TextEditingController();
+
+  String userId = '';
+  String? transactionData;
 
   @override
   void initState() {
     super.initState();
+    _loadUserId();
     controller.fetchBooks();
     _searchController.addListener(() {
       controller.searchBooks(_searchController.text.trim());
     });
   }
 
+  Future<void> _loadUserId() async {
+    final userData = await LocalStorage.getUserData();
+    final id = userData['user_id'] ?? '';
+
+    final transaction = await transactionController.fetchTransaction(id);
+
+    setState(() {
+      userId = id;
+      transactionData = transaction?['transaction_id'] ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final role = mainController.role.value;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Cari Buku"),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.local_mall),
-            onPressed: () {
-              Get.toNamed('/transaction-user');
-            },
-            tooltip: 'Transaksi Saya',
-          ),
+          if (role == 'anggota') ...[
+            IconButton(
+              icon: const Icon(Icons.local_mall),
+              onPressed: () {
+                Get.toNamed('/transaction-user', arguments: {
+                  'transaction_id': transactionData,
+                });
+              },
+              tooltip: 'Transaksi Saya',
+            ),
+          ]
         ],
       ),
       body: Column(

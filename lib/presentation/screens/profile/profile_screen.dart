@@ -112,20 +112,22 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ItemCard(
-                  title: 'Laporan',
-                  onTap: () {
-                    MySnackBar.show(
-                      title: 'Dalam Pengembangan',
-                      message: 'Fitur ini sedang dalam pengembangan',
-                      backgroundColor: Colors.orange,
-                      fontColor: Colors.white,
-                      icon: Icons.warning_amber_rounded,
-                    );
-                    // Get.toNamed("/report");
-                  },
-                ),
-                const SizedBox(height: 16),
+                if (role == 'admin') ...[
+                  ItemCard(
+                    title: 'Laporan',
+                    onTap: () {
+                      MySnackBar.show(
+                        title: 'Dalam Pengembangan',
+                        message: 'Fitur ini sedang dalam pengembangan',
+                        backgroundColor: Colors.orange,
+                        fontColor: Colors.white,
+                        icon: Icons.warning_amber_rounded,
+                      );
+                      // Get.toNamed("/report");
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 ItemCard(
                   title: 'Tentang Developer',
                   onTap: () {

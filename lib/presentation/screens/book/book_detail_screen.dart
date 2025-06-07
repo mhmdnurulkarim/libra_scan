@@ -22,6 +22,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   final mainController = Get.find<MainScreenController>();
 
   String userId = '';
+  String? transactionData;
   bool isCheckingData = true;
   Map<String, dynamic>? data;
   int quantity = 1;
@@ -37,13 +38,18 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
   Future<void> _loadUserId() async {
     final userData = await LocalStorage.getUserData();
+    final id = userData['user_id'] ?? '';
+
+    final transaction = await transactionController.fetchTransaction(id);
+
     setState(() {
-      userId = userData['user_id'] ?? '';
+      userId = id;
+      transactionData = transaction?['transaction_id'] ?? '';
     });
   }
 
   Future<void> _checkArguments() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
     setState(() {
       data = Get.arguments as Map<String, dynamic>?;
       isCheckingData = false;
@@ -58,7 +64,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final data = Get.arguments as Map<String, dynamic>?;
+    final role = mainController.role.value;
 
     if (isCheckingData) {
       return Center(
@@ -79,25 +85,29 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       );
     }
 
-    final String title = data['title'] ?? 'Judul Tidak Diketahui';
-    final String isbn = data['isbn'] ?? '-';
-    final String author = data['author'] ?? '-';
-    final categoriseRef = data['category_id'] as DocumentReference?;
-    final int stock = data['stock'] ?? 0;
-    final String sinopsis = data['synopsis'] ?? 'Sinopsis tidak tersedia.';
+    final String title = data!['title'] ?? 'Judul Tidak Diketahui';
+    final String isbn = data!['isbn'] ?? '-';
+    final String author = data!['author'] ?? '-';
+    final categoriseRef = data!['category_id'] as DocumentReference?;
+    final int stock = data!['stock'] ?? 0;
+    final String sinopsis = data!['synopsis'] ?? 'Sinopsis tidak tersedia.';
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail Buku'),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.local_mall),
-            onPressed: () {
-              Get.toNamed('/transaction-user');
-            },
-            tooltip: 'Transaksi Saya',
-          ),
+          if (role == 'anggota') ...[
+            IconButton(
+              icon: const Icon(Icons.local_mall),
+              onPressed: () {
+                Get.toNamed('/transaction-user', arguments: {
+                  'transaction_id': transactionData,
+                });
+              },
+              tooltip: 'Transaksi Saya',
+            ),
+          ]
         ],
       ),
       backgroundColor: ColorConstant.backgroundColor(context),

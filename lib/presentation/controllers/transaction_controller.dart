@@ -13,6 +13,30 @@ class TransactionController extends GetxController {
   var bookList = <Map<String, dynamic>>[].obs;
   var quantity = 1.obs;
 
+  Future<Map<String, dynamic>?> fetchTransaction(String userId) async {
+    try {
+      final userRef = FirebaseFirestore.instance.collection('user').doc(userId);
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('transaction')
+          .where('user_id', isEqualTo: userRef)
+          .where('return_date', isEqualTo: null)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
+        final data = doc.data();
+        data['transaction_id'] = doc.id;
+        return data;
+      }
+
+      return null;
+    } catch (e) {
+      print('Gagal mengambil transaksi: $e');
+      return null;
+    }
+  }
+
   Future<void> submitTransaction({
     required String userId,
     required Map<String, dynamic> book,
@@ -284,6 +308,7 @@ class TransactionController extends GetxController {
             }
 
             final userFormatted = {
+              'user_id': userRef.id,
               'nin': userData['nin'] ?? '',
               'name': userData['name'] ?? '',
               'email': accountData['email'] ?? '',
@@ -315,10 +340,16 @@ class TransactionController extends GetxController {
         if (!bookSnapshot.exists) continue;
 
         final bookData = bookSnapshot.data() as Map<String, dynamic>;
-        books.add({'title': bookData['title'], 'author': bookData['author']});
+        books.add({
+          'title': bookData['title'],
+          'author': bookData['author'],
+          'quantity': data['quantity'],
+          'detail_id': detail.id,
+        });
       }
 
       result['books'] = books;
+      result['detail'] = detailSnapshot;
     } catch (e) {
       print('Error loading transaction data: $e');
     }
@@ -340,7 +371,7 @@ class TransactionController extends GetxController {
     await docRef.update({'return_date': now, 'status_transaction': status});
 
     if (status == 'returned') {
-      final detailSnap = await docRef.collection('transaction_details').get();
+      final detailSnap = await docRef.collection('transaction_detail').get();
 
       for (var detailDoc in detailSnap.docs) {
         final detailData = detailDoc.data();
@@ -396,6 +427,52 @@ class TransactionController extends GetxController {
         backgroundColor: Colors.green,
         fontColor: Colors.white,
         icon: Icons.check,
+      );
+    }
+  }
+
+  Future<void> removeBookFromTransaction(
+    String transactionId,
+    String detailId,
+  ) async {
+    try {
+      final detailRef = FirebaseFirestore.instance
+          .collection('transaction')
+          .doc(transactionId)
+          .collection('transaction_detail')
+          .doc(detailId);
+
+      await detailRef.delete();
+
+      final remainingDetails =
+          await FirebaseFirestore.instance
+              .collection('transaction')
+              .doc(transactionId)
+              .collection('transaction_detail')
+              .get();
+
+      if (remainingDetails.docs.isEmpty) {
+        await FirebaseFirestore.instance
+            .collection('transaction')
+            .doc(transactionId)
+            .delete();
+        Get.back();
+      }
+
+      MySnackBar.show(
+        title: 'Berhasil',
+        message: 'Buku berhasil dihapus dari transaksi.',
+        backgroundColor: Colors.green,
+        fontColor: Colors.white,
+        icon: Icons.check,
+      );
+    } catch (e) {
+      MySnackBar.show(
+        title: 'Gagal',
+        message: 'Gagal menghapus buku dari transaksi: $e',
+        backgroundColor: Colors.red,
+        fontColor: Colors.white,
+        icon: Icons.block,
       );
     }
   }
