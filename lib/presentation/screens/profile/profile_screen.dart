@@ -116,14 +116,7 @@ class ProfileScreen extends StatelessWidget {
                   ItemCard(
                     title: 'Laporan',
                     onTap: () {
-                      MySnackBar.show(
-                        title: 'Dalam Pengembangan',
-                        message: 'Fitur ini sedang dalam pengembangan',
-                        backgroundColor: Colors.orange,
-                        fontColor: Colors.white,
-                        icon: Icons.warning_amber_rounded,
-                      );
-                      // Get.toNamed("/report");
+                      Get.toNamed("/report");
                     },
                   ),
                   const SizedBox(height: 16),
@@ -131,14 +124,7 @@ class ProfileScreen extends StatelessWidget {
                 ItemCard(
                   title: 'Tentang Developer',
                   onTap: () {
-                    MySnackBar.show(
-                      title: 'Dalam Pengembangan',
-                      message: 'Fitur ini sedang dalam pengembangan',
-                      backgroundColor: Colors.orange,
-                      fontColor: Colors.white,
-                      icon: Icons.warning_amber_rounded,
-                    );
-                    // Get.toNamed("/about");
+                    Get.toNamed("/about");
                   },
                 ),
                 const SizedBox(height: 16),

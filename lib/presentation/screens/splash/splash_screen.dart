@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import '../../../common/constants/color_constans.dart';
 import '../../../data/share_preference.dart';
 
@@ -18,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
 
     final userData = await LocalStorage.getUserData();
     final userId = userData['user_id'];
@@ -35,13 +36,23 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: ColorConstant.primaryColor(context),
       body: Center(
-        child: Text(
-          'LibraScan',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: ColorConstant.backgroundColor(context),
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 200,
+              child: Lottie.asset('asset/lottie/book.json'),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'LibraScan',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );

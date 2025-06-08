@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:libra_scan/presentation/widgets/snackbar.dart';
-import 'package:libra_scan/common/constants/color_constans.dart';
 
 import '../../data/share_preference.dart';
 
@@ -50,7 +49,10 @@ class AuthController extends GetxController {
 
       final user = userCredential.user;
       if (user == null) {
-        throw FirebaseAuthException(code: 'invalid-user', message: 'User tidak ditemukan');
+        throw FirebaseAuthException(
+          code: 'invalid-user',
+          message: 'User tidak ditemukan',
+        );
       }
 
       final userId = user.uid;
@@ -70,12 +72,13 @@ class AuthController extends GetxController {
       final userData = userDoc.data()!;
 
       // Ambil akun user dari subkoleksi account
-      final accountSnap = await _firestore
-          .collection('user')
-          .doc(userId)
-          .collection('account')
-          .limit(1)
-          .get();
+      final accountSnap =
+          await _firestore
+              .collection('user')
+              .doc(userId)
+              .collection('account')
+              .limit(1)
+              .get();
 
       if (accountSnap.docs.isEmpty) {
         MySnackBar.show(
@@ -114,7 +117,10 @@ class AuthController extends GetxController {
     } catch (e) {
       MySnackBar.show(
         title: 'Login Gagal',
-        message: e is FirebaseAuthException ? e.message ?? 'Terjadi kesalahan saat login.' : e.toString(),
+        message:
+            e is FirebaseAuthException
+                ? e.message ?? 'Terjadi kesalahan saat login.'
+                : e.toString(),
         backgroundColor: Colors.red,
         fontColor: Colors.white,
         icon: Icons.error_outline,
@@ -124,7 +130,6 @@ class AuthController extends GetxController {
     }
   }
 
-
   /// LOGIN - Google
   Future<void> loginWithGoogle() async {
     try {
@@ -132,7 +137,10 @@ class AuthController extends GetxController {
 
       final googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        throw FirebaseAuthException(code: 'sign-in-cancelled', message: 'Login dibatalkan oleh pengguna.');
+        throw FirebaseAuthException(
+          code: 'sign-in-cancelled',
+          message: 'Login dibatalkan oleh pengguna.',
+        );
       }
 
       final googleAuth = await googleUser.authentication;
@@ -145,7 +153,10 @@ class AuthController extends GetxController {
       final user = userCredential.user;
 
       if (user == null || user.email == null) {
-        throw FirebaseAuthException(code: 'user-not-found', message: 'Data pengguna tidak ditemukan.');
+        throw FirebaseAuthException(
+          code: 'user-not-found',
+          message: 'Data pengguna tidak ditemukan.',
+        );
       }
 
       final userId = user.uid;
@@ -158,12 +169,13 @@ class AuthController extends GetxController {
       if (userDoc.exists) {
         final userData = userDoc.data()!;
 
-        final accountSnap = await _firestore
-            .collection('user')
-            .doc(userId)
-            .collection('account')
-            .limit(1)
-            .get();
+        final accountSnap =
+            await _firestore
+                .collection('user')
+                .doc(userId)
+                .collection('account')
+                .limit(1)
+                .get();
 
         if (accountSnap.docs.isEmpty) {
           MySnackBar.show(
@@ -200,15 +212,18 @@ class AuthController extends GetxController {
         Get.offAllNamed('/main');
       } else {
         // User baru, arahkan ke register detail
-        Get.offAllNamed('/register-detail', arguments: {
-          'email': user.email!,
-          'user_id': userId,
-        });
+        Get.offAllNamed(
+          '/register-detail',
+          arguments: {'email': user.email!, 'user_id': userId},
+        );
       }
     } catch (e) {
       MySnackBar.show(
         title: 'Google Sign-In Gagal',
-        message: e is FirebaseAuthException ? e.message ?? 'Terjadi kesalahan saat login.' : e.toString(),
+        message:
+            e is FirebaseAuthException
+                ? e.message ?? 'Terjadi kesalahan saat login.'
+                : e.toString(),
         backgroundColor: Colors.red,
         fontColor: Colors.white,
         icon: Icons.login,
@@ -262,15 +277,9 @@ class AuthController extends GetxController {
           .collection('user')
           .doc(userId)
           .collection('account')
-          .add({
-        'email': email,
-        'role_id': roleRef,
-        'status': true,
-      });
+          .add({'email': email, 'role_id': roleRef, 'status': true});
 
-      await accountRef.update({
-        'account_id': accountRef.id,
-      });
+      await accountRef.update({'account_id': accountRef.id});
 
       MySnackBar.show(
         title: 'Sukses',
@@ -333,15 +342,9 @@ class AuthController extends GetxController {
           .collection('user')
           .doc(userId)
           .collection('account')
-          .add({
-        'email': email,
-        'role_id': roleRef,
-        'status': true,
-      });
+          .add({'email': email, 'role_id': roleRef, 'status': true});
 
-      await accountRef.update({
-        'account_id': accountRef.id,
-      });
+      await accountRef.update({'account_id': accountRef.id});
 
       // Tautkan email-password ke Google account
       final currentUser = _auth.currentUser;
@@ -409,7 +412,6 @@ class AuthController extends GetxController {
         icon: Icons.error_outline,
       );
       return;
-
     } finally {
       isLoading.value = false;
     }
@@ -427,13 +429,13 @@ class AuthController extends GetxController {
       'address': userData['address'] ?? '',
       'phone_number': userData['phone_number'] ?? '',
       'email': accountData['email'] ?? '',
-      'role_id': accountData['role_id'] is DocumentReference
-          ? (accountData['role_id'] as DocumentReference).id
-          : accountData['role_id'],
+      'role_id':
+          accountData['role_id'] is DocumentReference
+              ? (accountData['role_id'] as DocumentReference).id
+              : accountData['role_id'],
       'status': '${accountData['status']}',
     });
   }
-
 
   /// LOGOUT
   Future<void> logout() async {

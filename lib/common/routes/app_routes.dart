@@ -43,7 +43,7 @@ class AppPages {
       name: AppRoutes.transactionAdmin,
       page: () => const TransactionAdminScreen(),
     ),
-    GetPage(name: AppRoutes.report, page: () => const ReportScreen()),
+    GetPage(name: AppRoutes.report, page: () => ReportScreen()),
     GetPage(name: AppRoutes.aboutDev, page: () => const AboutScreen()),
   ];
 }
