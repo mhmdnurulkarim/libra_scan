@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 class ReportController extends GetxController {
-  final RxString selectedFilter = 'Tahunan'.obs;
+  final RxString selectedFilter = 'Mingguan'.obs;
   final RxList<String> filters = ['Hari Ini', 'Mingguan', 'Bulanan', 'Tahunan'].obs;
   final RxList<double> values = <double>[].obs;
   final RxList<String> xLabels = <String>[].obs;

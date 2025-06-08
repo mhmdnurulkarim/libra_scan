@@ -19,32 +19,41 @@ class ReportScreen extends StatelessWidget {
 
     pdf.addPage(
       pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              "Laporan Perpustakaan",
-              style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Table.fromTextArray(
-              headers: ['Periode', 'Jumlah'],
-              data: List.generate(
-                controller.xLabels.length,
+        build:
+            (context) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  "Laporan Perpustakaan",
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Table.fromTextArray(
+                  headers: ['Periode', 'Jumlah'],
+                  data: List.generate(
+                    controller.xLabels.length,
                     (index) => [
-                  controller.xLabels[index],
-                  controller.values[index].toInt().toString(),
-                ],
-              ),
+                      controller.xLabels[index],
+                      controller.values[index].toInt().toString(),
+                    ],
+                  ),
+                ),
+                pw.SizedBox(height: 40),
+                pw.Text(
+                  'Filter: ${controller.selectedFilter.value}',
+                  style: const pw.TextStyle(fontSize: 12),
+                ),
+              ],
             ),
-            pw.SizedBox(height: 40),
-            pw.Text('Filter: ${controller.selectedFilter.value}', style: const pw.TextStyle(fontSize: 12)),
-          ],
-        ),
       ),
     );
 
-    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
   }
 
   @override
@@ -59,39 +68,50 @@ class ReportScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Filter Buttons
-            Obx(() => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: controller.filters.map((filter) {
-                bool isSelected = controller.selectedFilter.value == filter;
-                return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isSelected ? ColorConstant.primaryColor(context) : Colors.grey.shade400,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    controller.selectedFilter.value = filter;
-                    controller.fetchReportData();
-                  },
-                  child: Text(filter),
-                );
-              }).toList(),
-            )),
+            Obx(
+                  () => SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: controller.filters.map((filter) {
+                    bool isSelected = controller.selectedFilter.value == filter;
+                    return Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSelected ? ColorConstant.primaryColor(context) : Colors.grey.shade400,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(8, 36),
+                          side: BorderSide(color: ColorConstant.secondaryColor(context)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          controller.selectedFilter.value = filter;
+                          controller.fetchReportData();
+                        },
+                        child: Text(filter),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
 
-            const SizedBox(height: 24),
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-            // Chart Section
-            Obx(() {
-              if (controller.isLoading.value) {
-                return const Expanded(child: Center(child: CircularProgressIndicator()));
-              }
-
-              if (controller.xLabels.isEmpty) {
-                return const Expanded(child: Center(child: Text("Tidak ada data")));
-              }
-
-              return Expanded(
-                child: AspectRatio(
+                if (controller.xLabels.isEmpty) {
+                  return const Center(child: Text("Tidak ada data"));
+                }
+                return AspectRatio(
                   aspectRatio: 1.4,
                   child: BarChart(
                     BarChartData(
@@ -106,31 +126,41 @@ class ReportScreen extends StatelessWidget {
                           barRods: [
                             BarChartRodData(
                               toY: controller.values[index],
-                              color: Colors.lightBlue,
+                              color: ColorConstant.primaryColor(context),
                               width: 22,
                             ),
                           ],
                         ),
                       ),
                       titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: true),
+                        ),
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
                             getTitlesWidget: (value, _) {
                               final index = value.toInt();
-                              if (index >= 0 && index < controller.xLabels.length) {
+                              if (index >= 0 &&
+                                  index < controller.xLabels.length) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
-                                  child: Text(controller.xLabels[index], style: const TextStyle(fontSize: 10)),
+                                  child: Text(
+                                    controller.xLabels[index],
+                                    style: const TextStyle(fontSize: 10),
+                                  ),
                                 );
                               }
                               return const SizedBox.shrink();
                             },
                           ),
                         ),
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
                       ),
                       barTouchData: BarTouchData(
                         enabled: true,
@@ -146,9 +176,9 @@ class ReportScreen extends StatelessWidget {
                       gridData: FlGridData(show: true),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
 
             const SizedBox(height: 16),
 
@@ -158,7 +188,10 @@ class ReportScreen extends StatelessWidget {
               child: MyButton(
                 onPressed: _generatePdfReport,
                 backgroundColor: ColorConstant.primaryColor(context),
-                child: const Text("Ekspor Laporan (PDF)", style: TextStyle(color: Colors.white)),
+                child: const Text(
+                  "Ekspor Laporan (PDF)",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],
