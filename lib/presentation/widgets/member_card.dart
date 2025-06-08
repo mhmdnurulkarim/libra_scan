@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:barcode_widget/barcode_widget.dart';
 import '../../common/constants/color_constans.dart';
 
 class MemberCard extends StatelessWidget {
@@ -33,7 +34,7 @@ class MemberCard extends StatelessWidget {
         children: [
           Container(
             width: 100,
-            height: 140,
+            height: 160,
             decoration: BoxDecoration(
               color: ColorConstant.secondaryColor(context),
               borderRadius: BorderRadius.circular(12),
@@ -70,21 +71,12 @@ class MemberCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Column(
                   children: [
-                    Container(
-                      height: 40,
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Text(
-                          'Barcode',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      userId,
-                      style: TextStyle(fontSize: 12, color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
+                    BarcodeWidget(
+                      barcode: Barcode.code128(),
+                      data: userId,
+                      height: 60,
+                      backgroundColor: Colors.white,
+                      drawText: false,
                     ),
                   ],
                 ),
