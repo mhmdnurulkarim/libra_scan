@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../common/constants/color_constans.dart';
 import '../../controllers/home_admin_controller.dart';
 import '../../widgets/request_book_card.dart';
+import '../../widgets/snackbar.dart';
 
 class HomeAdminScreen extends StatefulWidget {
   HomeAdminScreen({super.key});
@@ -35,7 +37,19 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 ElevatedButton(
-                  onPressed: () => Get.toNamed('/scanner'),
+                  onPressed: () {
+                    if (kIsWeb) {
+                      MySnackBar.show(
+                        title: 'On Progress',
+                        message: 'Fitur pemindaian barcode untuk versi Web sedang dalam tahap pengembangan. Silakan gunakan aplikasi versi mobile untuk sementara.',
+                        backgroundColor: ColorConstant.dangerColor(context),
+                        fontColor: Colors.white,
+                        icon: Icons.close,
+                      );
+                    } else {
+                      Get.toNamed('/scanner');
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorConstant.primaryColor(context),
                     minimumSize: const Size(double.infinity, 120),

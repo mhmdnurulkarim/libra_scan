@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:libra_scan/presentation/widgets/button.dart';
 import 'package:pdf/pdf.dart';
@@ -30,9 +30,14 @@ class ReportScreen extends StatelessWidget {
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  'Filter: ${controller.selectedFilter.value}',
+                  style: const pw.TextStyle(fontSize: 12),
+                ),
                 pw.SizedBox(height: 20),
                 pw.Table.fromTextArray(
-                  headers: ['Periode', 'Jumlah'],
+                  headers: ['Periode', 'Jumlah Buku'],
                   data: List.generate(
                     controller.xLabels.length,
                     (index) => [
@@ -40,11 +45,14 @@ class ReportScreen extends StatelessWidget {
                       controller.values[index].toInt().toString(),
                     ],
                   ),
-                ),
-                pw.SizedBox(height: 40),
-                pw.Text(
-                  'Filter: ${controller.selectedFilter.value}',
-                  style: const pw.TextStyle(fontSize: 12),
+                  cellAlignment: pw.Alignment.center,
+                  headerStyle: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.white,
+                  ),
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColors.green,
+                  ),
                 ),
               ],
             ),
@@ -69,34 +77,41 @@ class ReportScreen extends StatelessWidget {
         child: Column(
           children: [
             Obx(
-                  () => SingleChildScrollView(
+              () => SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: controller.filters.map((filter) {
-                    bool isSelected = controller.selectedFilter.value == filter;
-                    return Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isSelected ? ColorConstant.primaryColor(context) : Colors.grey.shade400,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(8, 36),
-                          side: BorderSide(color: ColorConstant.secondaryColor(context)),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                  children:
+                      controller.filters.map((filter) {
+                        bool isSelected =
+                            controller.selectedFilter.value == filter;
+                        return Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  isSelected
+                                      ? ColorConstant.primaryColor(context)
+                                      : Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(8, 36),
+                              side: BorderSide(
+                                color: ColorConstant.secondaryColor(context),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: () {
+                              controller.selectedFilter.value = filter;
+                              controller.fetchReportData();
+                            },
+                            child: Text(filter),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {
-                          controller.selectedFilter.value = filter;
-                          controller.fetchReportData();
-                        },
-                        child: Text(filter),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                 ),
               ),
             ),
@@ -116,12 +131,16 @@ class ReportScreen extends StatelessWidget {
                   child: BarChart(
                     BarChartData(
                       alignment: BarChartAlignment.spaceAround,
-                      maxY: (controller.values.isNotEmpty)
-                          ? (controller.values.reduce((a, b) => a > b ? a : b) + 2)
-                          : 10,
+                      maxY:
+                          (controller.values.isNotEmpty)
+                              ? (controller.values.reduce(
+                                    (a, b) => a > b ? a : b,
+                                  ) +
+                                  2)
+                              : 10,
                       barGroups: List.generate(
                         controller.values.length,
-                            (index) => BarChartGroupData(
+                        (index) => BarChartGroupData(
                           x: index,
                           barRods: [
                             BarChartRodData(
@@ -179,9 +198,7 @@ class ReportScreen extends StatelessWidget {
                 );
               }),
             ),
-
             const SizedBox(height: 16),
-
             // Export Button
             SizedBox(
               width: double.infinity,

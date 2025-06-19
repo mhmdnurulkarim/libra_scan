@@ -52,7 +52,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     title: 'Buku Tidak Ditemukan',
                     message: 'Buku dengan barcode ini tidak ditemukan.',
                     backgroundColor: ColorConstant.dangerColor(context),
-                    fontColor: ColorConstant.fontColor(context),
+                    fontColor: Colors.white,
                     icon: Icons.close,
                   );
                 }

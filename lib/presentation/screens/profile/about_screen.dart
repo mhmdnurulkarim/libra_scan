@@ -53,7 +53,7 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              "Saya adalah mahasiswa semester delapan jurusan Sistem Informasi dengan keahlian dalam pengembangan aplikasi mobile menggunakan Java, Kotlin, dan Flutter, serta pengalaman membangun aplikasi Android yang fungsional dan efisien. Saya berkomitmen untuk menghasilkan kode berkualitas tinggi dan menghadirkan solusi inovatif yang selaras dengan kebutuhan pengguna. Dengan motivasi yang kuat untuk terus belajar dan berkembang saya siap memberikan kontribusi sebagai Mobile Developer di perusahaan Anda.",
+              "Saya merupakan mahasiswa aktif pada Program Studi Sistem Informasi di Universitas Metamedia, Kota Padang, yang ditempuh sejak tahun 2021. Sebelumnya, saya menempuh pendidikan menengah kejuruan di SMK Negeri 1 Kota Bengkulu, dengan jurusan Teknik Komputer dan Jaringan. Selama menjalani masa studi, saya secara aktif mengembangkan keahlian di bidang pengembangan aplikasi mobile, khususnya menggunakan Java, Kotlin, dan Flutter.",
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 20),
