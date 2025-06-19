@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -134,24 +135,30 @@ class AuthController extends GetxController {
   Future<void> loginWithGoogle() async {
     try {
       isLoading.value = true;
+      UserCredential userCredential;
 
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        throw FirebaseAuthException(
-          code: 'sign-in-cancelled',
-          message: 'Login dibatalkan oleh pengguna.',
+      if (kIsWeb) {
+        final googleProvider = GoogleAuthProvider();
+        userCredential = await _auth.signInWithPopup(googleProvider);
+      } else {
+        final googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) {
+          throw FirebaseAuthException(
+            code: 'sign-in-cancelled',
+            message: 'Login dibatalkan oleh pengguna.',
+          );
+        }
+
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
         );
+
+        userCredential = await _auth.signInWithCredential(credential);
       }
 
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
-
       if (user == null || user.email == null) {
         throw FirebaseAuthException(
           code: 'user-not-found',
@@ -169,13 +176,12 @@ class AuthController extends GetxController {
       if (userDoc.exists) {
         final userData = userDoc.data()!;
 
-        final accountSnap =
-            await _firestore
-                .collection('user')
-                .doc(userId)
-                .collection('account')
-                .limit(1)
-                .get();
+        final accountSnap = await _firestore
+            .collection('user')
+            .doc(userId)
+            .collection('account')
+            .limit(1)
+            .get();
 
         if (accountSnap.docs.isEmpty) {
           MySnackBar.show(
@@ -190,7 +196,6 @@ class AuthController extends GetxController {
 
         final accountData = accountSnap.docs.first.data();
 
-        // Cek apakah akun aktif
         if (accountData['status'] != true) {
           MySnackBar.show(
             title: 'Akun Nonaktif',
@@ -202,7 +207,6 @@ class AuthController extends GetxController {
           return;
         }
 
-        // Simpan data lokal
         await saveLoggedInUserData(
           userId: userId,
           userData: userData,
@@ -211,7 +215,7 @@ class AuthController extends GetxController {
 
         Get.offAllNamed('/main');
       } else {
-        // User baru, arahkan ke register detail
+        // User baru
         Get.offAllNamed(
           '/register-detail',
           arguments: {'email': user.email!, 'user_id': userId},
@@ -220,10 +224,9 @@ class AuthController extends GetxController {
     } catch (e) {
       MySnackBar.show(
         title: 'Google Sign-In Gagal',
-        message:
-            e is FirebaseAuthException
-                ? e.message ?? 'Terjadi kesalahan saat login.'
-                : e.toString(),
+        message: e is FirebaseAuthException
+            ? e.message ?? 'Terjadi kesalahan saat login.'
+            : e.toString(),
         backgroundColor: Colors.red,
         fontColor: Colors.white,
         icon: Icons.login,

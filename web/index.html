@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -31,26 +18,8 @@
 
   <title>Libra Scan</title>
   <link rel="manifest" href="manifest.json">
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJy_AnKjg-4MV8jnC3r1qGfZRF5ch52Zs",
-      authDomain: "librascan-7daa0.firebaseapp.com",
-      databaseURL: "https://librascan-7daa0-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "librascan-7daa0",
-      storageBucket: "librascan-7daa0.firebasestorage.app",
-      messagingSenderId: "10237643625",
-      appId: "1:10237643625:web:2ba53b8a341efbcf840bf8",
-      measurementId: "G-HJ9NPR44WD"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
-  </script>
 </body>
 </html>

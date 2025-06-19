@@ -108,6 +108,11 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                     children: [
                       ...books.map(
                         (book) =>
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: 8,
+                              ),
+                              child:
                             RequestBookCard(
                               name: book['title'],
                               email: book['author'],
@@ -117,6 +122,7 @@ class _TransactionAdminScreenState extends State<TransactionAdminScreen> {
                             },
                           ),
                         ),
+                      ),
                       const SizedBox(height: 24),
                       if (estimateReturn != null)
                         Center(
