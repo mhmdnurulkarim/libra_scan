@@ -1,39 +1,39 @@
 # Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
+/*.class
+/*.log
+/*.pyc
+/*.swp
+/.DS_Store
+/.atom/
+/.buildlog/
+/.history
+/.svn/
+/migrate_working_dir/
 
 # IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
+/*.iml
+/*.ipr
+/*.iws
+/.idea/
 
 # VSCode
-.vscode/
+/.vscode/
 
 # Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
+/**/doc/api/
+/**/ios/Flutter/.last_build_id
+/.dart_tool/
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.pub-cache/
+/.pub/
 /build/
 
 # Symbolication related
-app.*.symbols
+/app.*.symbols
 
 # Obfuscation related
-app.*.map.json
+/app.*.map.json
 
 # Android Studio build outputs
 /android/app/debug
@@ -41,40 +41,40 @@ app.*.map.json
 /android/app/release
 
 # Gradle
-.gradle/
-local.properties
-**/build/
-.cxx/
+/.gradle/
+/local.properties
+/**/build/
+/.cxx/
 
 # iOS / macOS
-ios/Pods/
-ios/Podfile.lock
-ios/.symlinks/
-macos/Pods/
-macos/Podfile.lock
-DerivedData/
+/ios/Pods/
+/ios/Podfile.lock
+/ios/.symlinks/
+/macos/Pods/
+/macos/Podfile.lock
+/DerivedData/
 
 # Windows / Linux
-windows/runner/Debug/
-windows/runner/Release/
-linux/build/
+/windows/runner/Debug/
+/windows/runner/Release/
+/linux/build/
 
 # Node.js
-node_modules/
-npm-debug.log
-yarn-error.log
-pnpm-debug.log
-package-lock.json
+/node_modules/
+/npm-debug.log
+/yarn-error.log
+/pnpm-debug.log
+/package-lock.json
 
 # Firebase / Secrets
-google-services.json
-firebase.json
-*.keystore
-*.jks
-*.pem
-*.p12
-*.key
-*.crt
+/google-services.json
+/firebase.json
+/*.keystore
+/*.jks
+/*.pem
+/*.p12
+/*.key
+/*.crt
 
 # OS specific
-Thumbs.db
+/Thumbs.db
