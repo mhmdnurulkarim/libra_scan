@@ -1,2 +1,0 @@
-D:/Project/Website/libra_scan/android/app/.cxx/Debug/m5ja4z25/x86/CMakeFiles/edit_cache.dir
-D:/Project/Website/libra_scan/android/app/.cxx/Debug/m5ja4z25/x86/CMakeFiles/rebuild_cache.dir
