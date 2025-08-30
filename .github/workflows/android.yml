@@ -28,7 +28,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
+          channel: stable
           cache: true
 
       - name: Flutter version
@@ -37,17 +37,21 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build Debug APK
-        run: flutter build apk --debug
+      - name: Build Release APK
+        run: |
+          flutter build apk --release \
+            --split-debug-info=build/symbols \
+            --obfuscate \
+            --tree-shake-icons
 
       - name: List build outputs
         run: ls -R build/app/outputs || true
 
-      - name: Upload APK artifact
+      - name: Upload APK artifact (release)
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug.apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
 
   release:
     needs: build
@@ -57,14 +61,14 @@ jobs:
       - name: Download APK artifact
         uses: actions/download-artifact@v4
         with:
-          name: app-debug.apk
+          name: app-release.apk
           path: dist
 
       - name: Rename APK with tag
         run: |
           TAG_NAME="${{ github.ref_name }}"
           NEW_NAME="LibraScan_${TAG_NAME}.apk"
-          mv "dist/app-debug.apk" "dist/${NEW_NAME}"
+          mv "dist/app-release.apk" "dist/${NEW_NAME}"
           echo "RENAMED_APK=dist/${NEW_NAME}" >> $GITHUB_ENV
 
       - name: Publish GitHub Release
