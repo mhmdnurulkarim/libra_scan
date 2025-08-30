@@ -42,10 +42,7 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           mkdir -p android/app
-          # tulis persis isi secret ke file (aman untuk multiline/karakter khusus)
           printf "%s" "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
-          # (opsional) cek file ada & tidak kosong
-          test -s android/app/google-services.json && echo "OK: google-services.json created"
 
       - name: Build Release APK
         run: |
